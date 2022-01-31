@@ -19,13 +19,22 @@ export class ConfigEditor extends PureComponent<Props, State> {
     onOptionsChange({ ...options, jsonData });
   };
 
+  onUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      username: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
   // Secure field (only sent to the backend)
-  onAPIKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
     onOptionsChange({
       ...options,
       secureJsonData: {
-        apiKey: event.target.value,
+        password: event.target.value,
       },
     });
   };
@@ -59,7 +68,18 @@ export class ConfigEditor extends PureComponent<Props, State> {
             inputWidth={20}
             onChange={this.onPathChange}
             value={jsonData.path || ''}
-            placeholder="json field returned to frontend"
+            placeholder="Base API Path"
+          />
+        </div>
+
+        <div className="gf-form">
+          <FormField
+            label="Username"
+            labelWidth={6}
+            inputWidth={20}
+            onChange={this.onUsernameChange}
+            value={jsonData.username || ''}
+            placeholder="API Username"
           />
         </div>
 
@@ -67,13 +87,13 @@ export class ConfigEditor extends PureComponent<Props, State> {
           <div className="gf-form">
             <SecretFormField
               isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
-              value={secureJsonData.apiKey || ''}
-              label="API Key"
+              value={secureJsonData.password || ''}
+              label="Password"
               placeholder="secure json field (backend only)"
               labelWidth={6}
               inputWidth={20}
               onReset={this.onResetAPIKey}
-              onChange={this.onAPIKeyChange}
+              onChange={this.onPasswordChange}
             />
           </div>
         </div>
