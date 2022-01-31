@@ -50,7 +50,8 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   }
 
   doWebsocket() {
-    //console.log(super.query(req));
+    //console.log(super.query(req));git
+    
     const channel = 'ds/N5ll_Khnk/stream';
     const addr = parseLiveChannelAddress(channel);
     console.log(addr);
