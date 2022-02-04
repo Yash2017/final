@@ -177,16 +177,20 @@ func (d *SampleDatasource) SubscribeStream(_ context.Context, req *backend.Subsc
 func DoneAsync(val chan []byte) {
 	//r := make(chan []byte, 5096)
 	log.DefaultLogger.Info("This is the quer string", st)
+	log.DefaultLogger.Info("Length of st is", len(st))
+	//if len(st) == 0 {
+	//	st = "ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all"
+	//}
 	config, err := websocket.NewConfig(st, st)
 	if err != nil {
-
+		log.DefaultLogger.Error(err.Error())
 	}
 	config.Header = http.Header{
 		"Authorization": {"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJncm91cHMiOlsiYWRtaW4iXSwiaWF0IjoxNjM3MDIyMzE2LCJuYmYiOjE2MzcwMjIzMTYsImV4cCI6MTYzNzAyMzIxNiwiZ3JhbnRfdHlwZSI6ImFjY2Vzc190b2tlbiJ9.V7WhUBwEc0rBq4jAtKbeWizSJErr5nVMd6kGcoh4k9g"},
 	}
 	ws, err := websocket.DialConfig(config)
 	if err != nil {
-
+		log.DefaultLogger.Error(err.Error())
 	}
 	var n int
 	retMsg := make([]byte, 5096)

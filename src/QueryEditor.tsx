@@ -1,13 +1,23 @@
 //import { defaults } from 'lodash';
 
-import React, { PureComponent, SyntheticEvent } from 'react';
-import { Select, Label } from '@grafana/ui';
-import { QueryEditorProps, SelectableValue, DataQueryRequest } from '@grafana/data';
-import { DataSource } from './datasource';
-import { defaultQuery, MyDataSourceOptions, MyQuery } from './types';
-import { cloneDeep, defaults } from 'lodash';
+import React, { PureComponent, SyntheticEvent } from "react";
+import { Select, Label } from "@grafana/ui";
+import {
+  QueryEditorProps,
+  SelectableValue,
+  DataQueryRequest,
+} from "@grafana/data";
+import { DataSource } from "./datasource";
+import { defaultQuery, MyDataSourceOptions, MyQuery } from "./types";
+import { cloneDeep, defaults } from "lodash";
 
-type MyState = { route_options: any; historian: any; devices: any; pubs: any; agents: any };
+type MyState = {
+  route_options: any;
+  historian: any;
+  devices: any;
+  pubs: any;
+  agents: any;
+};
 
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
@@ -16,43 +26,47 @@ type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 export class QueryEditor extends PureComponent<Props, MyState> {
   constructor(props: Props) {
     super(props);
-    this.props.datasource.register_query_routes_callback(this.update_query_routes);
-    let segments = this.props.query.route?.split('/');
+    this.props.datasource.register_query_routes_callback(
+      this.update_query_routes
+    );
+    let segments = this.props.query.route?.split("/");
 
     if (segments) {
-      if (segments[0] === '') {
+      if (segments[0] === "") {
         segments.shift();
       }
     } else {
       segments = [];
     }
-    console.log('at start, in constructor, segments has: ');
+    console.log("at start, in constructor, segments has: ");
     console.log(segments);
     this.props.onRunQuery();
 
-    let q_param_entries = this.props.query.query_params?.split('&').map((p) => p.split('='));
+    let q_param_entries = this.props.query.query_params
+      ?.split("&")
+      .map((p) => p.split("="));
     let q_params = q_param_entries ? Object.fromEntries(q_param_entries) : {};
-    console.log('q_params is: ');
+    console.log("q_params is: ");
     console.log(q_params);
     this.state = {
       devices: {
-        tag: q_params.tag || '',
-        regex: q_params.regex || '',
-        read_all: q_params['read-all'] === 'true',
+        tag: q_params.tag || "",
+        regex: q_params.regex || "",
+        read_all: q_params["read-all"] === "true",
       },
       historian: {
-        tag: q_params.tag || '',
-        regex: q_params.regex || '',
-        read_all: q_params['read-all'] === 'true',
-        write_all: q_params['write-all'] === 'true',
+        tag: q_params.tag || "",
+        regex: q_params.regex || "",
+        read_all: q_params["read-all"] === "true",
+        write_all: q_params["write-all"] === "true",
       },
       pubs: {
-        topic: q_params.topic || '',
+        topic: q_params.topic || "",
       },
       agents: {
-        running: q_params.running === 'true',
-        packaged: q_params.packaged === 'true',
-        installed: q_params.installed === 'true',
+        running: q_params.running === "true",
+        packaged: q_params.packaged === "true",
+        installed: q_params.installed === "true",
       },
       route_options: {
         current_route: segments,
@@ -66,8 +80,8 @@ export class QueryEditor extends PureComponent<Props, MyState> {
     let datasrc = this.props.datasource;
     let q = {
       refId: this.props.datasource.id.toString(),
-      http_method: 'GET',
-      route: '',
+      http_method: "GET",
+      route: "",
     } as MyQuery;
     let request = {} as DataQueryRequest;
     request.targets = [q];
@@ -75,7 +89,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
     segments.forEach((seg: any, indx: any) => {
       let request = {} as DataQueryRequest;
       request.targets = [q];
-      q.route = q.route?.split('?')[0] + '/' + seg;
+      q.route = q.route?.split("?")[0] + "/" + seg;
       datasrc.query(request);
     });
   }
@@ -85,7 +99,10 @@ export class QueryEditor extends PureComponent<Props, MyState> {
     const { onChange, query, onRunQuery } = this.props;
     let new_route_opts = cloneDeep(this.state.route_options);
     if (index < new_route_opts.current_route.length) {
-      new_route_opts.current_route = new_route_opts.current_route.slice(0, index);
+      new_route_opts.current_route = new_route_opts.current_route.slice(
+        0,
+        index
+      );
       new_route_opts.current_route.push(segment.value);
     } else if (index === new_route_opts.current_route.length) {
       new_route_opts.current_route.push(segment.value);
@@ -95,7 +112,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
         delete new_route_opts.segments[key];
       }
     });
-    onChange({ ...query, route: '/' + new_route_opts.current_route.join('/') });
+    onChange({ ...query, route: "/" + new_route_opts.current_route.join("/") });
     onRunQuery();
     this.setState({ route_options: new_route_opts });
   };
@@ -109,7 +126,8 @@ export class QueryEditor extends PureComponent<Props, MyState> {
 
   update_query_routes = (route_options: any, segment_number: number) => {
     let state_copy = cloneDeep(this.state);
-    state_copy.route_options.segments[segment_number /*new_key*/] = Object.keys(route_options);
+    state_copy.route_options.segments[segment_number /*new_key*/] =
+      Object.keys(route_options);
     this.setState(state_copy);
     this.forceUpdate();
   };
@@ -118,10 +136,14 @@ export class QueryEditor extends PureComponent<Props, MyState> {
     const segments = this.state.route_options.segments;
     const current_route = this.state.route_options.current_route;
     const topic_segment =
-      current_route.indexOf('topics') >= 0 ? current_route.indexOf('topics') : current_route.indexOf('devices');
+      current_route.indexOf("topics") >= 0
+        ? current_route.indexOf("topics")
+        : current_route.indexOf("devices");
     return Object.keys(segments).map((index: string) => {
       const route_options =
-        topic_segment >= 0 && index > topic_segment ? ['-'].concat(segments[index].sort()) : segments[index].sort();
+        topic_segment >= 0 && index > topic_segment
+          ? ["-"].concat(segments[index].sort())
+          : segments[index].sort();
       return (
         <Select
           key={index}
@@ -140,50 +162,50 @@ export class QueryEditor extends PureComponent<Props, MyState> {
 
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
     //this.state.route_options.current_route.includes('historians')
     let current_route = this.state.route_options.current_route;
     let state_copy = cloneDeep(this.state);
-    if (current_route.includes('historians')) {
-      if (name === 'tag') {
+    if (current_route.includes("historians")) {
+      if (name === "tag") {
         state_copy.historian.tag = value;
       }
-      if (name === 'regex') {
+      if (name === "regex") {
         state_copy.historian.regex = value;
       }
-      if (name === 'read_all') {
+      if (name === "read_all") {
         state_copy.historian.read_all = value;
       }
-      if (name === 'write_all') {
+      if (name === "write_all") {
         state_copy.historian.write_all = value;
       }
     }
-    if (current_route.includes('devices')) {
-      if (name === 'tag') {
+    if (current_route.includes("devices")) {
+      if (name === "tag") {
         state_copy.devices.tag = value;
       }
-      if (name === 'regex') {
+      if (name === "regex") {
         state_copy.devices.regex = value;
       }
-      if (name === 'read_all') {
+      if (name === "read_all") {
         state_copy.devices.read_all = value;
       }
     }
-    if (current_route.includes('agents')) {
-      if (name === 'installed') {
+    if (current_route.includes("agents")) {
+      if (name === "installed") {
         state_copy.agents.installed = value;
       }
-      if (name === 'packaged') {
+      if (name === "packaged") {
         state_copy.agents.packaged = value;
       }
-      if (name === 'running') {
+      if (name === "running") {
         state_copy.agents.running = value;
       }
     }
 
-    if (current_route.includes('pubsub')) {
-      if (name === 'topic') {
+    if (current_route.includes("pubsub")) {
+      if (name === "topic") {
         state_copy.pubs.topic = value;
       }
     }
@@ -193,51 +215,51 @@ export class QueryEditor extends PureComponent<Props, MyState> {
   update_query_params = (event: any) => {
     let historian_query_parameters = this.state.historian;
     let current_route = this.state.route_options.current_route;
-    if (current_route.includes('historians')) {
+    if (current_route.includes("historians")) {
       this.props.query.query_params =
-        'tag=' +
+        "tag=" +
         encodeURIComponent(historian_query_parameters.tag) +
-        '&regex=' +
+        "&regex=" +
         encodeURIComponent(historian_query_parameters.regex) +
-        '&' +
-        'read-all=' +
+        "&" +
+        "read-all=" +
         encodeURIComponent(historian_query_parameters.read_all) +
-        '&' +
-        'write-all=' +
+        "&" +
+        "write-all=" +
         encodeURIComponent(historian_query_parameters.write_all);
     }
     let devices_query_params = this.state.devices;
-    if (current_route.includes('devices')) {
+    if (current_route.includes("devices")) {
       this.props.query.query_params =
-        'tag=' +
+        "tag=" +
         encodeURIComponent(devices_query_params.tag) +
-        '&regex=' +
+        "&regex=" +
         encodeURIComponent(devices_query_params.regex) +
-        '&read-all=' +
+        "&read-all=" +
         encodeURIComponent(devices_query_params.read_all);
     }
     let agents_query_params = this.state.agents;
-    if (current_route.includes('agents')) {
+    if (current_route.includes("agents")) {
       this.props.query.query_params =
-        'running=' +
+        "running=" +
         encodeURIComponent(agents_query_params.running) +
-        '&packaged=' +
+        "&packaged=" +
         encodeURIComponent(agents_query_params.packaged) +
-        '&installed=' +
+        "&installed=" +
         encodeURIComponent(agents_query_params.installed);
     }
     let pubsub_query_params = this.state.pubs;
-    if (current_route.includes('pubsub')) {
-      this.props.query.query_params = 'topic=' + encodeURIComponent(pubsub_query_params.topic);
+    if (current_route.includes("pubsub")) {
+      this.props.query.query_params = pubsub_query_params.topic;
     }
     this.props.onRunQuery();
   };
 
   generate_query_parameter_elements() {
-    if (this.state.route_options.current_route.includes('historians')) {
+    if (this.state.route_options.current_route.includes("historians")) {
       return (
         <form onSubmit={this.update_query_params}>
-          <div style={{ whiteSpace: 'pre-wrap' }}>
+          <div style={{ whiteSpace: "pre-wrap" }}>
             <label>Tag</label>
             <input
               type="text"
@@ -247,7 +269,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                 this.handleChange(v);
               }}
             />
-            {'  '}
+            {"  "}
             <label>Regex</label>
             <input
               type="text"
@@ -257,7 +279,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                 this.handleChange(v);
               }}
             />
-            {this.props.query.http_method === 'GET' && (
+            {this.props.query.http_method === "GET" && (
               <label>
                 <input
                   type="checkbox"
@@ -270,8 +292,8 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                 read-all
               </label>
             )}
-            {this.props.query.http_method === 'PUT' ||
-              (this.props.query.http_method === 'DELETE' && (
+            {this.props.query.http_method === "PUT" ||
+              (this.props.query.http_method === "DELETE" && (
                 <label>
                   <input
                     type="checkbox"
@@ -284,15 +306,20 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                   write-all
                 </label>
               ))}
-            {'   '}
-            <input type="button" value="Submit" height={55} onClick={this.update_query_params} />
+            {"   "}
+            <input
+              type="button"
+              value="Submit"
+              height={55}
+              onClick={this.update_query_params}
+            />
           </div>
         </form>
       );
-    } else if (this.state.route_options.current_route.includes('devices')) {
+    } else if (this.state.route_options.current_route.includes("devices")) {
       return (
         <form onSubmit={this.update_query_params}>
-          <div style={{ whiteSpace: 'pre-wrap' }}>
+          <div style={{ whiteSpace: "pre-wrap" }}>
             <label>Tag</label>
             <input
               type="text"
@@ -311,7 +338,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                 this.handleChange(v);
               }}
             />
-            {this.props.query.http_method === 'GET' && (
+            {this.props.query.http_method === "GET" && (
               <label>
                 read-all
                 <input
@@ -324,8 +351,8 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                 />
               </label>
             )}
-            {this.props.query.http_method === 'PUT' ||
-              (this.props.query.http_method === 'DELETE' && (
+            {this.props.query.http_method === "PUT" ||
+              (this.props.query.http_method === "DELETE" && (
                 <label>
                   write-all
                   <input
@@ -338,15 +365,20 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                   />
                 </label>
               ))}
-            {'   '}
-            <input type="button" value="Submit" height={55} onClick={this.update_query_params} />
+            {"   "}
+            <input
+              type="button"
+              value="Submit"
+              height={55}
+              onClick={this.update_query_params}
+            />
           </div>
         </form>
       );
-    } else if (this.state.route_options.current_route.includes('agents')) {
+    } else if (this.state.route_options.current_route.includes("agents")) {
       return (
         <form onSubmit={this.update_query_params}>
-          <div style={{ whiteSpace: 'pre-wrap' }}>
+          <div style={{ whiteSpace: "pre-wrap" }}>
             <label>
               <input
                 type="checkbox"
@@ -358,7 +390,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
               />
               Running
             </label>
-            {'  '}
+            {"  "}
             <label>
               <input
                 type="checkbox"
@@ -370,7 +402,7 @@ export class QueryEditor extends PureComponent<Props, MyState> {
               />
               Installed
             </label>
-            {'  '}
+            {"  "}
             <label>
               <input
                 type="checkbox"
@@ -382,15 +414,20 @@ export class QueryEditor extends PureComponent<Props, MyState> {
               />
               Packaged
             </label>
-            {'   '}
-            <input type="button" value="Submit" height={55} onClick={this.update_query_params} />
+            {"   "}
+            <input
+              type="button"
+              value="Submit"
+              height={55}
+              onClick={this.update_query_params}
+            />
           </div>
         </form>
       );
-    } else if (this.state.route_options.current_route.includes('pubsub')) {
+    } else if (this.state.route_options.current_route.includes("pubsub")) {
       return (
         <form onSubmit={this.update_query_params}>
-          <div style={{ whiteSpace: 'pre-wrap' }}>
+          <div style={{ whiteSpace: "pre-wrap" }}>
             <label>Topic</label>
             <input
               type="input"
@@ -400,13 +437,18 @@ export class QueryEditor extends PureComponent<Props, MyState> {
                 this.handleChange(v);
               }}
             />
-            {'   '}
-            <input type="button" value="Submit" height={55} onClick={this.update_query_params} />
+            {"   "}
+            <input
+              type="button"
+              value="Submit"
+              height={55}
+              onClick={this.update_query_params}
+            />
           </div>
         </form>
       );
     } else {
-      return '';
+      return "";
     }
   }
 
@@ -421,10 +463,10 @@ export class QueryEditor extends PureComponent<Props, MyState> {
     const query = defaults(this.props.query, defaultQuery);
     const { http_method } = query;
     const method_options = [
-      { label: 'GET', value: 'GET' },
-      { label: 'POST', value: 'POST' },
-      { label: 'PUT', value: 'PUT' },
-      { label: 'DELETE', value: 'DELETE' },
+      { label: "GET", value: "GET" },
+      { label: "POST", value: "POST" },
+      { label: "PUT", value: "PUT" },
+      { label: "DELETE", value: "DELETE" },
     ];
 
     return (

@@ -9,15 +9,20 @@ import {
   MutableDataFrame,
   isValidLiveChannelAddress,
   parseLiveChannelAddress,
-} from '@grafana/data';
-import { FetchResponse, getBackendSrv, DataSourceWithBackend, getGrafanaLiveSrv } from '@grafana/runtime';
-import { defaultQuery, MyDataSourceOptions, MyQuery } from './types';
-import { Observable } from 'rxjs';
-import { filter, merge } from 'rxjs/operators';
-import { defaults, isEmpty } from 'lodash';
+} from "@grafana/data";
+import {
+  FetchResponse,
+  getBackendSrv,
+  DataSourceWithBackend,
+  getGrafanaLiveSrv,
+} from "@grafana/runtime";
+import { defaultQuery, MyDataSourceOptions, MyQuery } from "./types";
+import { Observable } from "rxjs";
+import { filter, merge } from "rxjs/operators";
+import { defaults, isEmpty } from "lodash";
 
 function first_unique_segment(entries: any[][]) {
-  const e_list = entries.map((x, i) => x[0].split('/'));
+  const e_list = entries.map((x, i) => x[0].split("/"));
   const zipped = Array(
     Math.min.apply(
       Math,
@@ -28,31 +33,39 @@ function first_unique_segment(entries: any[][]) {
     .map((x, i) => e_list.map((s) => s[i]));
   return zipped.map((x) => x.every((y, i, arr) => y === arr[0])).indexOf(false);
 }
+//let isStreaming = true;
 
-export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptions> {
+export class DataSource extends DataSourceWithBackend<
+  MyQuery,
+  MyDataSourceOptions
+> {
   url?: string;
   path: string;
 
-  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
+  constructor(
+    instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>
+  ) {
     super(instanceSettings);
     // super(instanceSettings);
     this.url = instanceSettings.url;
-    this.path = instanceSettings.jsonData.path || '';
+    this.path = instanceSettings.jsonData.path || "";
   }
   route_update_callback(path?: string): (options_response: any) => void {
-    console.log('Datasource route_update_callback received something but callback has not been set! ');
+    console.log(
+      "Datasource route_update_callback received something but callback has not been set! "
+    );
     return () => {};
   }
 
   log_and_return(x: string, return_empty: boolean): string {
     console.log(x);
-    return return_empty ? '' : x;
+    return return_empty ? "" : x;
   }
 
   doWebsocket() {
     //console.log(super.query(req));git
-    
-    const channel = 'ds/N5ll_Khnk/stream';
+
+    const channel = "ds/RQ-Trmank/stream";
     const addr = parseLiveChannelAddress(channel);
     console.log(addr);
     console.log(isValidLiveChannelAddress(addr));
@@ -61,10 +74,11 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     });
   }
   doRequest(query: MyQuery, request_type: string) {
-    console.log('IN DO_REQUEST');
-    const routePath = request_type === 'websocket' ? '/vuiwebsock' : '/volttron';
-    let url = this.url + routePath + '/vui' + query.route;
-    if (routePath === '/vuiwebsock') {
+    console.log("IN DO_REQUEST");
+    const routePath =
+      request_type === "websocket" ? "/vuiwebsock" : "/volttron";
+    let url = this.url + routePath + "/vui" + query.route;
+    if (routePath === "/vuiwebsock") {
       //url = 'ws:/' + url;
       //console.log('This is the url', url);
       //this.doWebsocket();
@@ -74,10 +88,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
       url: url,
       data: query.data,
     };
-    console.log('request is: ');
+    console.log("request is: ");
     console.log(request);
 
-    console.log('This is the getBackendSrv', getBackendSrv());
+    console.log("This is the getBackendSrv", getBackendSrv());
     //return 1;
 
     return getBackendSrv().fetch(request);
@@ -86,11 +100,11 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   alert_on_error(response: Observable<FetchResponse>) {
     response.pipe(filter((x) => !isEmpty(x.data.error))).subscribe({
       next(x: any) {
-        console.log('VUI ERROR: ', x.data.error);
+        console.log("VUI ERROR: ", x.data.error);
         alert(x.data.error);
       },
       error(x: any) {
-        console.log('VUI ERROR: ', x.data.error);
+        console.log("VUI ERROR: ", x.data.error);
         alert(x.data.error);
       },
       complete() {},
@@ -102,7 +116,9 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     options: DataQueryRequest,
     response: Observable<FetchResponse>
   ): Observable<DataQueryResponse> {
-    response.pipe(filter((x) => !isEmpty(x.data.route_options))).subscribe(this.route_update_callback(query.route));
+    response
+      .pipe(filter((x) => !isEmpty(x.data.route_options)))
+      .subscribe(this.route_update_callback(query.route));
     return this._empty_data_frame_observable(query);
   }
 
@@ -111,15 +127,15 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     options: DataQueryRequest,
     response: Observable<FetchResponse>
   ): Observable<DataQueryResponse> {
-    console.log('IN PROCESS_GENERIC');
+    console.log("IN PROCESS_GENERIC");
     return new Observable<DataQueryResponse>((subscriber) => {
       const frame = new MutableDataFrame({
         refId: query.refId,
-        fields: [{ name: 'Response Value', type: FieldType.string }],
+        fields: [{ name: "Response Value", type: FieldType.string }],
       });
       response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
         next(x) {
-          frame.add({ 'Response Value': JSON.stringify(x.data) });
+          frame.add({ "Response Value": JSON.stringify(x.data) });
           subscriber.next({
             data: [frame],
             key: query.refId,
@@ -163,15 +179,15 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   log_all_nexts(response: Observable<FetchResponse>) {
     response.subscribe({
       next(x: any) {
-        console.log('LOG_ALL_NEXTS NEXT:');
+        console.log("LOG_ALL_NEXTS NEXT:");
         console.log(x);
       },
       error(err: any) {
-        console.log('LOG_ALL_NEXTS ERROR: ');
+        console.log("LOG_ALL_NEXTS ERROR: ");
         console.log(err.data.error);
       },
       complete() {
-        console.log('LOG_ALL_NEXTS COMPLETE');
+        console.log("LOG_ALL_NEXTS COMPLETE");
       },
     });
   }
@@ -181,10 +197,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     options: DataQueryRequest,
     response: Observable<FetchResponse>
   ): Observable<DataQueryResponse> {
-    console.log('IN PROCESS_HISTORIAN_TS');
+    console.log("IN PROCESS_HISTORIAN_TS");
     return new Observable<DataQueryResponse>((subscriber) => {
       const frame = new CircularDataFrame({
-        append: 'tail',
+        append: "tail",
         capacity: options.maxDataPoints,
       });
       response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
@@ -194,9 +210,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           const unique_seg = first_unique_segment(entries);
           if (frame.fields.length === 0) {
             frame.refId = query.refId;
-            frame.addField({ name: 'Time', type: FieldType.time });
+            frame.addField({ name: "Time", type: FieldType.time });
             for (let [topic, data] of entries) {
-              const field_name = topic.split('/').slice(unique_seg).join('/') || '';
+              const field_name =
+                topic.split("/").slice(unique_seg).join("/") || "";
               const first_value = data.value[0][1];
               frame.addField({
                 name: field_name,
@@ -208,7 +225,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           //TODO: Figure out how to get rid of need for ignoring linting errors here. How to declare types?
           // @ts-ignore
           entries
-            .map((x: any) => x[1]['value'].map((y: any) => y[0]))
+            .map((x: any) => x[1]["value"].map((y: any) => y[0]))
             .flat()
             .forEach((x: any) => ts_set.add(x));
           let data_map = {};
@@ -232,7 +249,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           });
         },
         error(err) {
-          console.log('ERROR FROM process_historian_ts.subscribe(): ' + err);
+          console.log("ERROR FROM process_historian_ts.subscribe(): " + err);
         },
         complete() {
           subscriber.complete();
@@ -246,10 +263,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     options: DataQueryRequest,
     response: Observable<FetchResponse>
   ): Observable<DataQueryResponse> {
-    console.log('IN PROCESS_DEVICE_TS');
+    console.log("IN PROCESS_DEVICE_TS");
     return new Observable<DataQueryResponse>((subscriber) => {
       const frame = new CircularDataFrame({
-        append: 'tail',
+        append: "tail",
         capacity: 1,
       });
       response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
@@ -258,9 +275,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           const unique_seg = first_unique_segment(entries);
           if (frame.fields.length === 0) {
             frame.refId = query.refId;
-            frame.addField({ name: 'Time', type: FieldType.time });
+            frame.addField({ name: "Time", type: FieldType.time });
             for (const [topic, data] of entries) {
-              const field_name = topic.split('/').slice(unique_seg).join('/') || '';
+              const field_name =
+                topic.split("/").slice(unique_seg).join("/") || "";
               const first_value = data.value;
               frame.addField({
                 name: field_name,
@@ -269,11 +287,12 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
             }
           }
           const row: any = {};
-          row['Time'] = Date.now();
+          row["Time"] = Date.now();
           for (let topic in x.data) {
-            if (!['metadata', 'units', 'type', 'tz'].includes(topic)) {
-              const field_name = topic.split('/').slice(unique_seg).join('/') || '';
-              row[field_name] = x.data[topic]['value'];
+            if (!["metadata", "units", "type", "tz"].includes(topic)) {
+              const field_name =
+                topic.split("/").slice(unique_seg).join("/") || "";
+              row[field_name] = x.data[topic]["value"];
             }
           }
           frame.add(row);
@@ -283,7 +302,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           });
         },
         error(err) {
-          console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
+          console.log("ERROR FROM process_device_ts.subscribe(): " + err);
         },
         complete() {
           subscriber.complete();
@@ -297,21 +316,21 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     options: DataQueryRequest,
     response: Observable<FetchResponse>
   ): Observable<DataQueryResponse> {
-    console.log('IN PROCESS_PUBSUB_TS');
+    console.log("IN PROCESS_PUBSUB_TS");
     return new Observable<DataQueryResponse>((subscriber) => {
-      console.log('IN RETURN NEW OBSERVABLE');
+      console.log("IN RETURN NEW OBSERVABLE");
       const frame = new CircularDataFrame({
-        append: 'tail',
+        append: "tail",
         capacity: 10,
       });
       response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
         next(x) {
-          console.log('In process_pubsub_ts, next(x) is: ');
+          console.log("In process_pubsub_ts, next(x) is: ");
           console.log(x);
           if (frame.fields.length === 0) {
             frame.refId = query.refId;
-            frame.addField({ name: 'Time', type: FieldType.time });
-            frame.addField({ name: 'Value', type: FieldType.string }); // TODO: Fix this.
+            frame.addField({ name: "Time", type: FieldType.time });
+            frame.addField({ name: "Value", type: FieldType.string }); // TODO: Fix this.
             // const field_name = entries[0][0].split('/').slice(-1).pop() || '';
             // const first_value = entries[0][1].value;
             // frame.addField({
@@ -320,13 +339,13 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
             // });
           }
           for (const topic in x.data) {
-            if (!['metadata', 'units', 'type', 'tz'].includes(topic)) {
-              const field_name = topic.split('/').slice(-1).pop() || '';
+            if (!["metadata", "units", "type", "tz"].includes(topic)) {
+              const field_name = topic.split("/").slice(-1).pop() || "";
               frame.add({
                 Time: Date.now(),
-                [field_name]: x.data[topic]['value'],
+                [field_name]: x.data[topic]["value"],
               });
-              console.log('frame is: ');
+              console.log("frame is: ");
               console.log(frame);
               subscriber.next({
                 data: [frame],
@@ -336,7 +355,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           }
         },
         error(err) {
-          console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
+          console.log("ERROR FROM process_device_ts.subscribe(): " + err);
         },
         complete() {
           subscriber.complete();
@@ -345,75 +364,210 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     });
   }
 
-  register_query_routes_callback(route_setter: (route_options: any, segment_number: number) => void) {
+  register_query_routes_callback(
+    route_setter: (route_options: any, segment_number: number) => void
+  ) {
     this.route_update_callback = (path?: string) => {
       return (options_response: any) => {
-        const segment_number = path && path.split('/').length >= 1 ? path.split('/').length - 1 : 0;
+        const segment_number =
+          path && path.split("/").length >= 1 ? path.split("/").length - 1 : 0;
         route_setter(options_response.data.route_options, segment_number);
       };
     };
   }
-
-  query(options: DataQueryRequest<MyQuery>): any /*Observable<DataQueryResponse>*/ {
+  sleep(delay: number) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay) {}
+  }
+  doReq(text: string) {
+    //if (isStreaming) {
+    console.log("inside doReq", text);
+    const url = "http://localhost:3030/api/ds/query";
+    const data = {
+      queries: [
+        {
+          //queryText:
+          //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+          queryText: text,
+          datasourceId: 4,
+          withStreaming: true,
+        },
+      ],
+    };
+    console.log("Response from backend srv", getBackendSrv().post(url, data));
+    //isStreaming = false;
+    /*} else {
+      console.log("Is streaming is false now");
+      const url = "http://localhost:3030/api/ds/query";
+      const da = {
+        queries: [
+          {
+            //queryText:
+            //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+            queryText: text,
+            datasourceId: 4,
+            withStreaming: false,
+          },
+        ],
+      };
+      console.log("Response from backend srv first");
+      getBackendSrv()
+        .post(url, da)
+        .then(() => {
+          const dat = {
+            queries: [
+              {
+                //queryText:
+                //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                queryText: text,
+                datasourceId: 4,
+                withStreaming: true,
+              },
+            ],
+          };
+          console.log(
+            "Response from backend srv second",
+            getBackendSrv().post(url, dat)
+          );
+          this.sleep(3000);
+        });
+      //console.log(res.then((data) => console.log(data.value)));
+      /*const dat = {
+        queries: [
+          {
+            //queryText:
+            //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+            queryText: text,
+            datasourceId: 4,
+            withStreaming: true,
+          },
+        ],
+      };
+      console.log(
+        "Response from backend srv second",
+        getBackendSrv().post(url, dat)
+      );
+        
+      //data.queries[0].withStreaming = true;
+      //console.log("Response from backend srv second", getBackendSrv().post(url, data));
+      } */
+  }
+  checkEmpty(tex: string) {
+    if (tex.length > 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  query(
+    options: DataQueryRequest<MyQuery>
+  ): any /*Observable<DataQueryResponse>*/ {
     const observables = options.targets.map((target) => {
       //let return_list: Observable<DataQueryResponse>[] = [];
       const query = defaults(target, defaultQuery);
 
-      if (query.http_method === 'GET') {
+      if (query.http_method === "GET") {
         if (query.route?.match(/^\/platforms\/.+\/pubsub\/?$/)) {
-          query.route = query.route + '/devices/Campus/Building1/Fake1/all';
-          console.log('This is the query inside query', query);
-          const reponse = this.doWebsocket();
-          const rep = super.query(options);
-          console.log('This is rep', rep);
-          console.log('This is response from inside the query', reponse);
-          return reponse;
-          //const response = this.doRequest(query, 'websocket');
-          //return this.process_pubsub_ts(query, options, response);
+          console.log("This is query params", query.query_params);
+          const temp = query.query_params;
+          if (!!temp) {
+            const rou =
+              "ws://localhost:8080/vui" +
+              query.route +
+              "/" +
+              query.query_params;
+            console.log(rou);
+            console.log("This is the query inside query", query);
+            this.doReq(rou);
+            const reponse = this.doWebsocket();
+            //const rep = super.query(options);
+            //console.log("This is rep", rep);
+            console.log("This is response from inside the query", reponse);
+            return reponse;
+            //const response = this.doRequest(query, 'websocket');
+            //return this.process_pubsub_ts(query, options, response);
+          }
         }
         if (query.route?.match(/^\/platforms\/.+\/pubsub\/.+\/?$/)) {
-          const response = this.doRequest(query, 'websocket');
+          //const response = this.doRequest(query, "websocket");
           // this.alert_on_error(response);
           // this.log_all_nexts(response);
-          return this.process_pubsub_ts(query, options, response);
+          return "Nothing";
         } else {
           // this.alert_on_error(response);
           // this.log_all_nexts(response);
-          if (query.route?.match(/^\/platforms\/.+\/historians\/.+\/topics\/.+\/?$/)) {
+          if (
+            query.route?.match(
+              /^\/platforms\/.+\/historians\/.+\/topics\/.+\/?$/
+            )
+          ) {
             if (options.range) {
-              query.route = query.route + '?start=' + options.range.from?.format();
-              query.route = query.route + '&end=' + options.range.to?.format();
-              query.route = query.route + '&count=' + options.maxDataPoints;
-              query.route = query.route + '&order=' + 'FIRST_TO_LAST';
+              query.route =
+                query.route + "?start=" + options.range.from?.format();
+              query.route = query.route + "&end=" + options.range.to?.format();
+              query.route = query.route + "&count=" + options.maxDataPoints;
+              query.route = query.route + "&order=" + "FIRST_TO_LAST";
               // query.route = query.route + '&' + query.query_params;
               if (query.query_params) {
-                query.route = query.route + '&' + query.query_params;
+                query.route = query.route + "&" + query.query_params;
               }
             }
-            const response = this.doRequest(query, 'http');
-            const routes_observable = this.process_route_options(query, options, response);
-            return routes_observable.pipe(merge(this.process_historian_ts(query, options, response)));
+            const response = this.doRequest(query, "http");
+            const routes_observable = this.process_route_options(
+              query,
+              options,
+              response
+            );
+            return routes_observable.pipe(
+              merge(this.process_historian_ts(query, options, response))
+            );
           } else if (query.route?.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
-            query.route = query.route + '?' + query.query_params;
-            const response = this.doRequest(query, 'http');
-            const routes_observable = this.process_route_options(query, options, response);
-            return routes_observable.pipe(merge(this.process_device_ts(query, options, response)));
-          } else if (query.route?.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
-            const response = this.doRequest(query, 'http');
-            const routes_observable = this.process_route_options(query, options, response);
-            return routes_observable.pipe(merge(this.process_platform_agents_rpc_method(query, options, response)));
+            query.route = query.route + "?" + query.query_params;
+            const response = this.doRequest(query, "http");
+            const routes_observable = this.process_route_options(
+              query,
+              options,
+              response
+            );
+            return routes_observable.pipe(
+              merge(this.process_device_ts(query, options, response))
+            );
+          } else if (
+            query.route?.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)
+          ) {
+            const response = this.doRequest(query, "http");
+            const routes_observable = this.process_route_options(
+              query,
+              options,
+              response
+            );
+            return routes_observable.pipe(
+              merge(
+                this.process_platform_agents_rpc_method(
+                  query,
+                  options,
+                  response
+                )
+              )
+            );
           } else {
-            const response = this.doRequest(query, 'http');
-            const routes_observable = this.process_route_options(query, options, response);
-            return routes_observable.pipe(merge(this.process_generic(query, options, response)));
+            const response = this.doRequest(query, "http");
+            const routes_observable = this.process_route_options(
+              query,
+              options,
+              response
+            );
+            return routes_observable.pipe(
+              merge(this.process_generic(query, options, response))
+            );
           }
         }
       } else {
-        const response = this.doRequest(query, 'http');
+        const response = this.doRequest(query, "http");
         return this.process_generic(query, options, response);
       }
     });
-    console.log('observables is:');
+    console.log("observables is:");
     console.log(observables);
     return observables[0];
   }
@@ -422,9 +576,9 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     return new Observable<DataQueryResponse>((subscriber) => {
       const frame = new MutableDataFrame({
         refId: query.refId,
-        fields: [{ name: ' ', type: FieldType.other }],
+        fields: [{ name: " ", type: FieldType.other }],
       });
-      frame.add({ ' ': 'No data' });
+      frame.add({ " ": "No data" });
       subscriber.next({
         data: [frame],
         key: query.refId,
@@ -436,8 +590,8 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   async testDatasource() {
     // Implement a health check for your data source.
     return {
-      status: 'success',
-      message: 'Success',
+      status: "success",
+      message: "Success",
     };
   }
 }
