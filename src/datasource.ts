@@ -33,7 +33,7 @@ function first_unique_segment(entries: any[][]) {
     .map((x, i) => e_list.map((s) => s[i]));
   return zipped.map((x) => x.every((y, i, arr) => y === arr[0])).indexOf(false);
 }
-//let isStreaming = true;
+let isStreaming = true;
 
 export class DataSource extends DataSourceWithBackend<
   MyQuery,
@@ -62,17 +62,6 @@ export class DataSource extends DataSourceWithBackend<
     return return_empty ? "" : x;
   }
 
-  doWebsocket() {
-    //console.log(super.query(req));git
-
-    const channel = "ds/RQ-Trmank/stream";
-    const addr = parseLiveChannelAddress(channel);
-    console.log(addr);
-    console.log(isValidLiveChannelAddress(addr));
-    return getGrafanaLiveSrv().getDataStream({
-      addr: addr!,
-    });
-  }
   doRequest(query: MyQuery, request_type: string) {
     console.log("IN DO_REQUEST");
     const routePath =
@@ -380,57 +369,44 @@ export class DataSource extends DataSourceWithBackend<
     while (new Date().getTime() < start + delay) {}
   }
   doReq(text: string) {
-    //if (isStreaming) {
-    console.log("inside doReq", text);
-    const url = "http://localhost:3030/api/ds/query";
     const data = {
       queries: [
         {
           //queryText:
           //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
           queryText: text,
-          datasourceId: 4,
+          datasourceId: 5,
           withStreaming: true,
         },
       ],
     };
-    console.log("Response from backend srv", getBackendSrv().post(url, data));
-    //isStreaming = false;
-    /*} else {
+    const url = "http://localhost:3030/api/ds/query";
+    if (isStreaming) {
+      console.log("inside doReq", text);
+      console.log("Response from backend srv", getBackendSrv().post(url, data));
+      isStreaming = false;
+    } else {
+      //isStreaming = true;
       console.log("Is streaming is false now");
-      const url = "http://localhost:3030/api/ds/query";
       const da = {
         queries: [
           {
             //queryText:
             //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
             queryText: text,
-            datasourceId: 4,
-            withStreaming: false,
+            datasourceId: 5,
+            withStreaming: true,
+            queryType: "new",
           },
         ],
       };
       console.log("Response from backend srv first");
       getBackendSrv()
         .post(url, da)
-        .then(() => {
-          const dat = {
-            queries: [
-              {
-                //queryText:
-                //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-                queryText: text,
-                datasourceId: 4,
-                withStreaming: true,
-              },
-            ],
-          };
-          console.log(
-            "Response from backend srv second",
-            getBackendSrv().post(url, dat)
-          );
-          this.sleep(3000);
+        .catch((err) => {
+          console.log("In catch", err);
         });
+      //isStreaming = true;
       //console.log(res.then((data) => console.log(data.value)));
       /*const dat = {
         queries: [
@@ -451,7 +427,20 @@ export class DataSource extends DataSourceWithBackend<
       //data.queries[0].withStreaming = true;
       //console.log("Response from backend srv second", getBackendSrv().post(url, data));
       } */
+    }
   }
+  doWebsocket() {
+    //console.log(super.query(req));git
+
+    const channel = "ds/fLpie8B7k/stream";
+    const addr = parseLiveChannelAddress(channel);
+    console.log(addr);
+    console.log(isValidLiveChannelAddress(addr));
+    return getGrafanaLiveSrv().getDataStream({
+      addr: addr!,
+    });
+  }
+
   checkEmpty(tex: string) {
     if (tex.length > 0) {
       return false;
@@ -479,6 +468,27 @@ export class DataSource extends DataSourceWithBackend<
             console.log(rou);
             console.log("This is the query inside query", query);
             this.doReq(rou);
+            this.sleep(3000);
+            const data = {
+              queries: [
+                {
+                  //queryText:
+                  //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                  queryText: rou,
+                  datasourceId: 5,
+                  withStreaming: true,
+                },
+              ],
+            };
+            const url = "http://localhost:3030/api/ds/query";
+            console.log(
+              "Call from query",
+              getBackendSrv()
+                .post(url, data)
+                .then(() => this.doWebsocket())
+            );
+            this.sleep(6000);
+            console.log("Calling websockets");
             const reponse = this.doWebsocket();
             //const rep = super.query(options);
             //console.log("This is rep", rep);

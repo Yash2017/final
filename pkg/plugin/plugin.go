@@ -80,13 +80,14 @@ type qModel struct {
 }
 
 var st = ""
+var stop = make(chan bool)
 
 //var que string = ""
 
 func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	response := backend.DataResponse{}
 	//log.DefaultLogger.Info("query is ", query.JSON)
-
+	stop <- false
 	qu, err := jsonparser.GetString(query.JSON, "queryText")
 	//que.fin := string(que.quer)
 	//que := string(quer)
@@ -95,7 +96,7 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 	if err != nil {
 		log.DefaultLogger.Info("JsonParser error is", err)
 	}
-	log.DefaultLogger.Info("This is the val string", st)
+	log.DefaultLogger.Info("This is the st string", st)
 	//dat, err := base64.StdEncoding.DecodeString(string(val))
 	//if err != nil {
 	//
@@ -133,7 +134,10 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 		}
 		frame.SetMeta(&data.FrameMeta{Channel: channel.String()})
 	}
-
+	if query.QueryType == "new" {
+		log.DefaultLogger.Info("Inside the if Function")
+		stop <- true
+	}
 	// add the frames to the response.
 	response.Frames = append(response.Frames, frame)
 
@@ -172,8 +176,7 @@ func (d *SampleDatasource) SubscribeStream(_ context.Context, req *backend.Subsc
 }
 
 // RunStream is called once for any open channel.  Results are shared with everyone
-// subscribed to the same channel.
-
+// subscribed to the same channel
 func DoneAsync(val chan []byte) {
 	//r := make(chan []byte, 5096)
 	log.DefaultLogger.Info("This is the quer string", st)
@@ -185,6 +188,7 @@ func DoneAsync(val chan []byte) {
 	if err != nil {
 		log.DefaultLogger.Error(err.Error())
 	}
+
 	config.Header = http.Header{
 		"Authorization": {"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJncm91cHMiOlsiYWRtaW4iXSwiaWF0IjoxNjM3MDIyMzE2LCJuYmYiOjE2MzcwMjIzMTYsImV4cCI6MTYzNzAyMzIxNiwiZ3JhbnRfdHlwZSI6ImFjY2Vzc190b2tlbiJ9.V7WhUBwEc0rBq4jAtKbeWizSJErr5nVMd6kGcoh4k9g"},
 	}
@@ -222,7 +226,6 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 		data.NewField("time", nil, make([]time.Time, 1)),
 		data.NewField("values", nil, make([]string, 1)),
 	)
-
 	counter := 0
 	val := make(chan []byte, 5096)
 	go DoneAsync(val)
@@ -230,6 +233,12 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 	// Stream data frames periodically till stream closed by Grafana.
 	for {
 		select {
+		case abc := <-stop:
+			if abc == true {
+				ct, cancel := context.WithCancel(ctx)
+				log.DefaultLogger.Info(ct.Err().Error())
+				cancel()
+			}
 		case <-ctx.Done():
 			log.DefaultLogger.Info("Context done, finish streaming", "path", req.Path)
 			return nil

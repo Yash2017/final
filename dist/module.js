@@ -9162,8 +9162,9 @@ function first_unique_segment(entries) {
       return y === arr[0];
     });
   }).indexOf(false);
-} //let isStreaming = true;
+}
 
+var isStreaming = true;
 
 var DataSource =
 /** @class */
@@ -9187,17 +9188,6 @@ function (_super) {
   DataSource.prototype.log_and_return = function (x, return_empty) {
     console.log(x);
     return return_empty ? "" : x;
-  };
-
-  DataSource.prototype.doWebsocket = function () {
-    //console.log(super.query(req));git
-    var channel = "ds/RQ-Trmank/stream";
-    var addr = Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["parseLiveChannelAddress"])(channel);
-    console.log(addr);
-    console.log(Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["isValidLiveChannelAddress"])(addr));
-    return Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getGrafanaLiveSrv"])().getDataStream({
-      addr: addr
-    });
   };
 
   DataSource.prototype.doRequest = function (query, request_type) {
@@ -9557,56 +9547,40 @@ function (_super) {
   };
 
   DataSource.prototype.doReq = function (text) {
-    //if (isStreaming) {
-    console.log("inside doReq", text);
-    var url = "http://localhost:3030/api/ds/query";
     var data = {
       queries: [{
         //queryText:
         //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
         queryText: text,
-        datasourceId: 4,
+        datasourceId: 5,
         withStreaming: true
       }]
     };
-    console.log("Response from backend srv", Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data)); //isStreaming = false;
+    var url = "http://localhost:3030/api/ds/query";
 
-    /*} else {
+    if (isStreaming) {
+      console.log("inside doReq", text);
+      console.log("Response from backend srv", Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data));
+      isStreaming = false;
+    } else {
+      //isStreaming = true;
       console.log("Is streaming is false now");
-      const url = "http://localhost:3030/api/ds/query";
-      const da = {
-        queries: [
-          {
-            //queryText:
-            //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-            queryText: text,
-            datasourceId: 4,
-            withStreaming: false,
-          },
-        ],
+      var da = {
+        queries: [{
+          //queryText:
+          //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+          queryText: text,
+          datasourceId: 5,
+          withStreaming: true,
+          queryType: "new"
+        }]
       };
       console.log("Response from backend srv first");
-      getBackendSrv()
-        .post(url, da)
-        .then(() => {
-          const dat = {
-            queries: [
-              {
-                //queryText:
-                //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-                queryText: text,
-                datasourceId: 4,
-                withStreaming: true,
-              },
-            ],
-          };
-          console.log(
-            "Response from backend srv second",
-            getBackendSrv().post(url, dat)
-          );
-          this.sleep(3000);
-        });
+      Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, da)["catch"](function (err) {
+        console.log("In catch", err);
+      }); //isStreaming = true;
       //console.log(res.then((data) => console.log(data.value)));
+
       /*const dat = {
         queries: [
           {
@@ -9626,6 +9600,18 @@ function (_super) {
       //data.queries[0].withStreaming = true;
       //console.log("Response from backend srv second", getBackendSrv().post(url, data));
       } */
+    }
+  };
+
+  DataSource.prototype.doWebsocket = function () {
+    //console.log(super.query(req));git
+    var channel = "ds/fLpie8B7k/stream";
+    var addr = Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["parseLiveChannelAddress"])(channel);
+    console.log(addr);
+    console.log(Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["isValidLiveChannelAddress"])(addr));
+    return Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getGrafanaLiveSrv"])().getDataStream({
+      addr: addr
+    });
   };
 
   DataSource.prototype.checkEmpty = function (tex) {
@@ -9656,6 +9642,26 @@ function (_super) {
             console.log("This is the query inside query", query);
 
             _this.doReq(rou);
+
+            _this.sleep(3000);
+
+            var data = {
+              queries: [{
+                //queryText:
+                //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                queryText: rou,
+                datasourceId: 5,
+                withStreaming: true
+              }]
+            };
+            var url = "http://localhost:3030/api/ds/query";
+            console.log("Call from query", Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data).then(function () {
+              return _this.doWebsocket();
+            }));
+
+            _this.sleep(6000);
+
+            console.log("Calling websockets");
 
             var reponse = _this.doWebsocket(); //const rep = super.query(options);
             //console.log("This is rep", rep);
