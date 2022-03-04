@@ -8593,7 +8593,7 @@ function (_super) {
           apiKey: false
         }),
         secureJsonData: Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options.secureJsonData), {
-          apiKey: ""
+          apiKey: ''
         })
       }));
     };
@@ -8615,7 +8615,7 @@ function (_super) {
       labelWidth: 6,
       inputWidth: 20,
       onChange: this.onPathChange,
-      value: jsonData.path || "",
+      value: jsonData.path || '',
       placeholder: "Base API Path"
     })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
       className: "gf-form"
@@ -8624,7 +8624,7 @@ function (_super) {
       labelWidth: 6,
       inputWidth: 20,
       onChange: this.onUsernameChange,
-      value: jsonData.username || "",
+      value: jsonData.username || '',
       placeholder: "API Username"
     })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
       className: "gf-form-inline"
@@ -8632,7 +8632,7 @@ function (_super) {
       className: "gf-form"
     }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(SecretFormField, {
       isConfigured: secureJsonFields && secureJsonFields.apiKey,
-      value: secureJsonData.password || "",
+      value: secureJsonData.password || '',
       label: "Password",
       placeholder: "secure json field (backend only)",
       labelWidth: 6,
@@ -8705,7 +8705,7 @@ function (_super) {
         }
       });
       onChange(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, query), {
-        route: "/" + new_route_opts.current_route.join("/")
+        route: '/' + new_route_opts.current_route.join('/')
       }));
       onRunQuery();
 
@@ -8740,9 +8740,9 @@ function (_super) {
     _this.generateSelectBox = function () {
       var segments = _this.state.route_options.segments;
       var current_route = _this.state.route_options.current_route;
-      var topic_segment = current_route.indexOf("topics") >= 0 ? current_route.indexOf("topics") : current_route.indexOf("devices");
+      var topic_segment = current_route.indexOf('topics') >= 0 ? current_route.indexOf('topics') : current_route.indexOf('devices');
       return Object.keys(segments).map(function (index) {
-        var route_options = topic_segment >= 0 && index > topic_segment ? ["-"].concat(segments[index].sort()) : segments[index].sort();
+        var route_options = topic_segment >= 0 && index > topic_segment ? ['-'].concat(segments[index].sort()) : segments[index].sort();
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_2__["Select"], {
           key: index,
           options: route_options.map(function (x) {
@@ -8762,60 +8762,60 @@ function (_super) {
 
     _this.handleChange = function (event) {
       var target = event.target;
-      var value = target.type === "checkbox" ? target.checked : target.value;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
       var name = target.name; //this.state.route_options.current_route.includes('historians')
 
       var current_route = _this.state.route_options.current_route;
       var state_copy = Object(lodash__WEBPACK_IMPORTED_MODULE_4__["cloneDeep"])(_this.state);
 
-      if (current_route.includes("historians")) {
-        if (name === "tag") {
+      if (current_route.includes('historians')) {
+        if (name === 'tag') {
           state_copy.historian.tag = value;
         }
 
-        if (name === "regex") {
+        if (name === 'regex') {
           state_copy.historian.regex = value;
         }
 
-        if (name === "read_all") {
+        if (name === 'read_all') {
           state_copy.historian.read_all = value;
         }
 
-        if (name === "write_all") {
+        if (name === 'write_all') {
           state_copy.historian.write_all = value;
         }
       }
 
-      if (current_route.includes("devices")) {
-        if (name === "tag") {
+      if (current_route.includes('devices')) {
+        if (name === 'tag') {
           state_copy.devices.tag = value;
         }
 
-        if (name === "regex") {
+        if (name === 'regex') {
           state_copy.devices.regex = value;
         }
 
-        if (name === "read_all") {
+        if (name === 'read_all') {
           state_copy.devices.read_all = value;
         }
       }
 
-      if (current_route.includes("agents")) {
-        if (name === "installed") {
+      if (current_route.includes('agents')) {
+        if (name === 'installed') {
           state_copy.agents.installed = value;
         }
 
-        if (name === "packaged") {
+        if (name === 'packaged') {
           state_copy.agents.packaged = value;
         }
 
-        if (name === "running") {
+        if (name === 'running') {
           state_copy.agents.running = value;
         }
       }
 
-      if (current_route.includes("pubsub")) {
-        if (name === "topic") {
+      if (current_route.includes('pubsub')) {
+        if (name === 'topic') {
           state_copy.pubs.topic = value;
         }
       }
@@ -8827,25 +8827,25 @@ function (_super) {
       var historian_query_parameters = _this.state.historian;
       var current_route = _this.state.route_options.current_route;
 
-      if (current_route.includes("historians")) {
-        _this.props.query.query_params = "tag=" + encodeURIComponent(historian_query_parameters.tag) + "&regex=" + encodeURIComponent(historian_query_parameters.regex) + "&" + "read-all=" + encodeURIComponent(historian_query_parameters.read_all) + "&" + "write-all=" + encodeURIComponent(historian_query_parameters.write_all);
+      if (current_route.includes('historians')) {
+        _this.props.query.query_params = 'tag=' + encodeURIComponent(historian_query_parameters.tag) + '&regex=' + encodeURIComponent(historian_query_parameters.regex) + '&' + 'read-all=' + encodeURIComponent(historian_query_parameters.read_all) + '&' + 'write-all=' + encodeURIComponent(historian_query_parameters.write_all);
       }
 
       var devices_query_params = _this.state.devices;
 
-      if (current_route.includes("devices")) {
-        _this.props.query.query_params = "tag=" + encodeURIComponent(devices_query_params.tag) + "&regex=" + encodeURIComponent(devices_query_params.regex) + "&read-all=" + encodeURIComponent(devices_query_params.read_all);
+      if (current_route.includes('devices')) {
+        _this.props.query.query_params = 'tag=' + encodeURIComponent(devices_query_params.tag) + '&regex=' + encodeURIComponent(devices_query_params.regex) + '&read-all=' + encodeURIComponent(devices_query_params.read_all);
       }
 
       var agents_query_params = _this.state.agents;
 
-      if (current_route.includes("agents")) {
-        _this.props.query.query_params = "running=" + encodeURIComponent(agents_query_params.running) + "&packaged=" + encodeURIComponent(agents_query_params.packaged) + "&installed=" + encodeURIComponent(agents_query_params.installed);
+      if (current_route.includes('agents')) {
+        _this.props.query.query_params = 'running=' + encodeURIComponent(agents_query_params.running) + '&packaged=' + encodeURIComponent(agents_query_params.packaged) + '&installed=' + encodeURIComponent(agents_query_params.installed);
       }
 
       var pubsub_query_params = _this.state.pubs;
 
-      if (current_route.includes("pubsub")) {
+      if (current_route.includes('pubsub')) {
         _this.props.query.query_params = pubsub_query_params.topic;
       }
 
@@ -8866,46 +8866,46 @@ function (_super) {
 
     _this.props.datasource.register_query_routes_callback(_this.update_query_routes);
 
-    var segments = (_a = _this.props.query.route) === null || _a === void 0 ? void 0 : _a.split("/");
+    var segments = (_a = _this.props.query.route) === null || _a === void 0 ? void 0 : _a.split('/');
 
     if (segments) {
-      if (segments[0] === "") {
+      if (segments[0] === '') {
         segments.shift();
       }
     } else {
       segments = [];
     }
 
-    console.log("at start, in constructor, segments has: ");
+    console.log('at start, in constructor, segments has: ');
     console.log(segments);
 
     _this.props.onRunQuery();
 
-    var q_param_entries = (_b = _this.props.query.query_params) === null || _b === void 0 ? void 0 : _b.split("&").map(function (p) {
-      return p.split("=");
+    var q_param_entries = (_b = _this.props.query.query_params) === null || _b === void 0 ? void 0 : _b.split('&').map(function (p) {
+      return p.split('=');
     });
     var q_params = q_param_entries ? Object.fromEntries(q_param_entries) : {};
-    console.log("q_params is: ");
+    console.log('q_params is: ');
     console.log(q_params);
     _this.state = {
       devices: {
-        tag: q_params.tag || "",
-        regex: q_params.regex || "",
-        read_all: q_params["read-all"] === "true"
+        tag: q_params.tag || '',
+        regex: q_params.regex || '',
+        read_all: q_params['read-all'] === 'true'
       },
       historian: {
-        tag: q_params.tag || "",
-        regex: q_params.regex || "",
-        read_all: q_params["read-all"] === "true",
-        write_all: q_params["write-all"] === "true"
+        tag: q_params.tag || '',
+        regex: q_params.regex || '',
+        read_all: q_params['read-all'] === 'true',
+        write_all: q_params['write-all'] === 'true'
       },
       pubs: {
-        topic: q_params.topic || ""
+        topic: q_params.topic || ''
       },
       agents: {
-        running: q_params.running === "true",
-        packaged: q_params.packaged === "true",
-        installed: q_params.installed === "true"
+        running: q_params.running === 'true',
+        packaged: q_params.packaged === 'true',
+        installed: q_params.installed === 'true'
       },
       route_options: {
         current_route: segments,
@@ -8917,8 +8917,8 @@ function (_super) {
     var datasrc = _this.props.datasource;
     var q = {
       refId: _this.props.datasource.id.toString(),
-      http_method: "GET",
-      route: ""
+      http_method: 'GET',
+      route: ''
     };
     var request = {};
     request.targets = [q];
@@ -8928,7 +8928,7 @@ function (_super) {
 
       var request = {};
       request.targets = [q];
-      q.route = ((_a = q.route) === null || _a === void 0 ? void 0 : _a.split("?")[0]) + "/" + seg;
+      q.route = ((_a = q.route) === null || _a === void 0 ? void 0 : _a.split('?')[0]) + '/' + seg;
       datasrc.query(request);
     });
     return _this;
@@ -8937,12 +8937,12 @@ function (_super) {
   QueryEditor.prototype.generate_query_parameter_elements = function () {
     var _this = this;
 
-    if (this.state.route_options.current_route.includes("historians")) {
+    if (this.state.route_options.current_route.includes('historians')) {
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         onSubmit: this.update_query_params
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         style: {
-          whiteSpace: "pre-wrap"
+          whiteSpace: 'pre-wrap'
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "Tag"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
@@ -8951,39 +8951,39 @@ function (_super) {
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "  ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "Regex"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), '  ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "Regex"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
         name: "regex",
         value: this.state.historian.regex,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), this.props.query.http_method === "GET" && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), this.props.query.http_method === 'GET' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         name: "read_all",
         checked: this.state.historian.read_all,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "read-all"), this.props.query.http_method === "PUT" || this.props.query.http_method === "DELETE" && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), "read-all"), this.props.query.http_method === 'PUT' || this.props.query.http_method === 'DELETE' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         name: "write_all",
         checked: this.state.historian.write_all,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "write-all"), "   ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), "write-all"), '   ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "button",
         value: "Submit",
         height: 55,
         onClick: this.update_query_params
       })));
-    } else if (this.state.route_options.current_route.includes("devices")) {
+    } else if (this.state.route_options.current_route.includes('devices')) {
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         onSubmit: this.update_query_params
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         style: {
-          whiteSpace: "pre-wrap"
+          whiteSpace: 'pre-wrap'
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "Tag"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
@@ -8999,32 +8999,32 @@ function (_super) {
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), this.props.query.http_method === "GET" && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "read-all", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), this.props.query.http_method === 'GET' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "read-all", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         name: "read_all",
         checked: this.state.devices.read_all,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      })), this.props.query.http_method === "PUT" || this.props.query.http_method === "DELETE" && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "write-all", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      })), this.props.query.http_method === 'PUT' || this.props.query.http_method === 'DELETE' && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "write-all", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         name: "write_all",
         checked: this.state.devices.write_all,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      })), "   ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      })), '   ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "button",
         value: "Submit",
         height: 55,
         onClick: this.update_query_params
       })));
-    } else if (this.state.route_options.current_route.includes("agents")) {
+    } else if (this.state.route_options.current_route.includes('agents')) {
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         onSubmit: this.update_query_params
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         style: {
-          whiteSpace: "pre-wrap"
+          whiteSpace: 'pre-wrap'
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
@@ -9033,32 +9033,32 @@ function (_super) {
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "Running"), "  ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), "Running"), '  ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         name: "installed",
         value: this.state.agents.installed,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "Installed"), "  ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), "Installed"), '  ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "checkbox",
         name: "packaged",
         value: this.state.agents.packaged,
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "Packaged"), "   ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), "Packaged"), '   ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "button",
         value: "Submit",
         height: 55,
         onClick: this.update_query_params
       })));
-    } else if (this.state.route_options.current_route.includes("pubsub")) {
+    } else if (this.state.route_options.current_route.includes('pubsub')) {
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         onSubmit: this.update_query_params
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         style: {
-          whiteSpace: "pre-wrap"
+          whiteSpace: 'pre-wrap'
         }
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", null, "Topic"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "input",
@@ -9067,14 +9067,14 @@ function (_super) {
         onChange: function onChange(v) {
           _this.handleChange(v);
         }
-      }), "   ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }), '   ', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "button",
         value: "Submit",
         height: 55,
         onClick: this.update_query_params
       })));
     } else {
-      return "";
+      return '';
     }
   };
 
@@ -9084,17 +9084,17 @@ function (_super) {
     var query = Object(lodash__WEBPACK_IMPORTED_MODULE_4__["defaults"])(this.props.query, _types__WEBPACK_IMPORTED_MODULE_3__["defaultQuery"]);
     var http_method = query.http_method;
     var method_options = [{
-      label: "GET",
-      value: "GET"
+      label: 'GET',
+      value: 'GET'
     }, {
-      label: "POST",
-      value: "POST"
+      label: 'POST',
+      value: 'POST'
     }, {
-      label: "PUT",
-      value: "PUT"
+      label: 'PUT',
+      value: 'PUT'
     }, {
-      label: "DELETE",
-      value: "DELETE"
+      label: 'DELETE',
+      value: 'DELETE'
     }];
     return (// TODO: Label does not appear in the same style as that of the FormField.
       react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
@@ -9148,7 +9148,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function first_unique_segment(entries) {
   var e_list = entries.map(function (x, i) {
-    return x[0].split("/");
+    return x[0].split('/');
   });
   var zipped = Array(Math.min.apply(Math, e_list.map(function (x) {
     return x.length;
@@ -9162,9 +9162,8 @@ function first_unique_segment(entries) {
       return y === arr[0];
     });
   }).indexOf(false);
-}
+} //let isStreaming = true;
 
-var isStreaming = true;
 
 var DataSource =
 /** @class */
@@ -9176,26 +9175,26 @@ function (_super) {
 
 
     _this.url = instanceSettings.url;
-    _this.path = instanceSettings.jsonData.path || "";
+    _this.path = instanceSettings.jsonData.path || '';
     return _this;
   }
 
   DataSource.prototype.route_update_callback = function (path) {
-    console.log("Datasource route_update_callback received something but callback has not been set! ");
+    console.log('Datasource route_update_callback received something but callback has not been set! ');
     return function () {};
   };
 
   DataSource.prototype.log_and_return = function (x, return_empty) {
     console.log(x);
-    return return_empty ? "" : x;
+    return return_empty ? '' : x;
   };
 
   DataSource.prototype.doRequest = function (query, request_type) {
-    console.log("IN DO_REQUEST");
-    var routePath = request_type === "websocket" ? "/vuiwebsock" : "/volttron";
-    var url = this.url + routePath + "/vui" + query.route;
+    console.log('IN DO_REQUEST');
+    var routePath = request_type === 'websocket' ? '/vuiwebsock' : '/volttron';
+    var url = this.url + routePath + '/vui' + query.route;
 
-    if (routePath === "/vuiwebsock") {//url = 'ws:/' + url;
+    if (routePath === '/vuiwebsock') {//url = 'ws:/' + url;
       //console.log('This is the url', url);
       //this.doWebsocket();
     }
@@ -9205,9 +9204,9 @@ function (_super) {
       url: url,
       data: query.data
     };
-    console.log("request is: ");
+    console.log('request is: ');
     console.log(request);
-    console.log("This is the getBackendSrv", Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])()); //return 1;
+    console.log('This is the getBackendSrv', Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])()); //return 1;
 
     return Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().fetch(request);
   };
@@ -9217,11 +9216,11 @@ function (_super) {
       return !Object(lodash__WEBPACK_IMPORTED_MODULE_6__["isEmpty"])(x.data.error);
     })).subscribe({
       next: function next(x) {
-        console.log("VUI ERROR: ", x.data.error);
+        console.log('VUI ERROR: ', x.data.error);
         alert(x.data.error);
       },
       error: function error(x) {
-        console.log("VUI ERROR: ", x.data.error);
+        console.log('VUI ERROR: ', x.data.error);
         alert(x.data.error);
       },
       complete: function complete() {}
@@ -9236,12 +9235,12 @@ function (_super) {
   };
 
   DataSource.prototype.process_generic = function (query, options, response) {
-    console.log("IN PROCESS_GENERIC");
+    console.log('IN PROCESS_GENERIC');
     return new rxjs__WEBPACK_IMPORTED_MODULE_4__["Observable"](function (subscriber) {
       var frame = new _grafana_data__WEBPACK_IMPORTED_MODULE_1__["MutableDataFrame"]({
         refId: query.refId,
         fields: [{
-          name: "Response Value",
+          name: 'Response Value',
           type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].string
         }]
       });
@@ -9250,7 +9249,7 @@ function (_super) {
       })).subscribe({
         next: function next(x) {
           frame.add({
-            "Response Value": JSON.stringify(x.data)
+            'Response Value': JSON.stringify(x.data)
           });
           subscriber.next({
             data: [frame],
@@ -9290,24 +9289,24 @@ function (_super) {
   DataSource.prototype.log_all_nexts = function (response) {
     response.subscribe({
       next: function next(x) {
-        console.log("LOG_ALL_NEXTS NEXT:");
+        console.log('LOG_ALL_NEXTS NEXT:');
         console.log(x);
       },
       error: function error(err) {
-        console.log("LOG_ALL_NEXTS ERROR: ");
+        console.log('LOG_ALL_NEXTS ERROR: ');
         console.log(err.data.error);
       },
       complete: function complete() {
-        console.log("LOG_ALL_NEXTS COMPLETE");
+        console.log('LOG_ALL_NEXTS COMPLETE');
       }
     });
   };
 
   DataSource.prototype.process_historian_ts = function (query, options, response) {
-    console.log("IN PROCESS_HISTORIAN_TS");
+    console.log('IN PROCESS_HISTORIAN_TS');
     return new rxjs__WEBPACK_IMPORTED_MODULE_4__["Observable"](function (subscriber) {
       var frame = new _grafana_data__WEBPACK_IMPORTED_MODULE_1__["CircularDataFrame"]({
-        append: "tail",
+        append: 'tail',
         capacity: options.maxDataPoints
       });
       response.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["filter"])(function (x) {
@@ -9323,7 +9322,7 @@ function (_super) {
           if (frame.fields.length === 0) {
             frame.refId = query.refId;
             frame.addField({
-              name: "Time",
+              name: 'Time',
               type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].time
             });
 
@@ -9333,7 +9332,7 @@ function (_super) {
                     topic = _b[0],
                     data = _b[1];
 
-                var field_name = topic.split("/").slice(unique_seg).join("/") || "";
+                var field_name = topic.split('/').slice(unique_seg).join('/') || '';
                 var first_value = data.value[0][1];
                 frame.addField({
                   name: field_name,
@@ -9357,7 +9356,7 @@ function (_super) {
           // @ts-ignore
 
           entries.map(function (x) {
-            return x[1]["value"].map(function (y) {
+            return x[1]['value'].map(function (y) {
               return y[0];
             });
           }).flat().forEach(function (x) {
@@ -9387,7 +9386,7 @@ function (_super) {
           });
         },
         error: function error(err) {
-          console.log("ERROR FROM process_historian_ts.subscribe(): " + err);
+          console.log('ERROR FROM process_historian_ts.subscribe(): ' + err);
         },
         complete: function complete() {
           subscriber.complete();
@@ -9397,10 +9396,10 @@ function (_super) {
   };
 
   DataSource.prototype.process_device_ts = function (query, options, response) {
-    console.log("IN PROCESS_DEVICE_TS");
+    console.log('IN PROCESS_DEVICE_TS');
     return new rxjs__WEBPACK_IMPORTED_MODULE_4__["Observable"](function (subscriber) {
       var frame = new _grafana_data__WEBPACK_IMPORTED_MODULE_1__["CircularDataFrame"]({
-        append: "tail",
+        append: 'tail',
         capacity: 1
       });
       response.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["filter"])(function (x) {
@@ -9415,7 +9414,7 @@ function (_super) {
           if (frame.fields.length === 0) {
             frame.refId = query.refId;
             frame.addField({
-              name: "Time",
+              name: 'Time',
               type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].time
             });
 
@@ -9425,7 +9424,7 @@ function (_super) {
                     topic = _b[0],
                     data = _b[1];
 
-                var field_name = topic.split("/").slice(unique_seg).join("/") || "";
+                var field_name = topic.split('/').slice(unique_seg).join('/') || '';
                 var first_value = data.value;
                 frame.addField({
                   name: field_name,
@@ -9446,12 +9445,12 @@ function (_super) {
           }
 
           var row = {};
-          row["Time"] = Date.now();
+          row['Time'] = Date.now();
 
           for (var topic in x.data) {
-            if (!["metadata", "units", "type", "tz"].includes(topic)) {
-              var field_name = topic.split("/").slice(unique_seg).join("/") || "";
-              row[field_name] = x.data[topic]["value"];
+            if (!['metadata', 'units', 'type', 'tz'].includes(topic)) {
+              var field_name = topic.split('/').slice(unique_seg).join('/') || '';
+              row[field_name] = x.data[topic]['value'];
             }
           }
 
@@ -9462,7 +9461,7 @@ function (_super) {
           });
         },
         error: function error(err) {
-          console.log("ERROR FROM process_device_ts.subscribe(): " + err);
+          console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
         },
         complete: function complete() {
           subscriber.complete();
@@ -9472,11 +9471,11 @@ function (_super) {
   };
 
   DataSource.prototype.process_pubsub_ts = function (query, options, response) {
-    console.log("IN PROCESS_PUBSUB_TS");
+    console.log('IN PROCESS_PUBSUB_TS');
     return new rxjs__WEBPACK_IMPORTED_MODULE_4__["Observable"](function (subscriber) {
-      console.log("IN RETURN NEW OBSERVABLE");
+      console.log('IN RETURN NEW OBSERVABLE');
       var frame = new _grafana_data__WEBPACK_IMPORTED_MODULE_1__["CircularDataFrame"]({
-        append: "tail",
+        append: 'tail',
         capacity: 10
       });
       response.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["filter"])(function (x) {
@@ -9485,17 +9484,17 @@ function (_super) {
         next: function next(x) {
           var _a;
 
-          console.log("In process_pubsub_ts, next(x) is: ");
+          console.log('In process_pubsub_ts, next(x) is: ');
           console.log(x);
 
           if (frame.fields.length === 0) {
             frame.refId = query.refId;
             frame.addField({
-              name: "Time",
+              name: 'Time',
               type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].time
             });
             frame.addField({
-              name: "Value",
+              name: 'Value',
               type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].string
             }); // TODO: Fix this.
             // const field_name = entries[0][0].split('/').slice(-1).pop() || '';
@@ -9507,12 +9506,12 @@ function (_super) {
           }
 
           for (var topic in x.data) {
-            if (!["metadata", "units", "type", "tz"].includes(topic)) {
-              var field_name = topic.split("/").slice(-1).pop() || "";
+            if (!['metadata', 'units', 'type', 'tz'].includes(topic)) {
+              var field_name = topic.split('/').slice(-1).pop() || '';
               frame.add((_a = {
                 Time: Date.now()
-              }, _a[field_name] = x.data[topic]["value"], _a));
-              console.log("frame is: ");
+              }, _a[field_name] = x.data[topic]['value'], _a));
+              console.log('frame is: ');
               console.log(frame);
               subscriber.next({
                 data: [frame],
@@ -9522,7 +9521,7 @@ function (_super) {
           }
         },
         error: function error(err) {
-          console.log("ERROR FROM process_device_ts.subscribe(): " + err);
+          console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
         },
         complete: function complete() {
           subscriber.complete();
@@ -9534,7 +9533,7 @@ function (_super) {
   DataSource.prototype.register_query_routes_callback = function (route_setter) {
     this.route_update_callback = function (path) {
       return function (options_response) {
-        var segment_number = path && path.split("/").length >= 1 ? path.split("/").length - 1 : 0;
+        var segment_number = path && path.split('/').length >= 1 ? path.split('/').length - 1 : 0;
         route_setter(options_response.data.route_options, segment_number);
       };
     };
@@ -9546,41 +9545,47 @@ function (_super) {
     while (new Date().getTime() < start + delay) {}
   };
 
-  DataSource.prototype.doReq = function (text) {
+  DataSource.prototype.doReq = function (text, addressForChannel) {
     var data = {
       queries: [{
         //queryText:
         //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
         queryText: text,
-        datasourceId: 5,
-        withStreaming: true
+        datasourceId: 7,
+        withStreaming: true,
+        queryType: addressForChannel
       }]
     };
-    var url = "http://localhost:3030/api/ds/query";
-
-    if (isStreaming) {
-      console.log("inside doReq", text);
-      console.log("Response from backend srv", Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data));
+    console.log(addressForChannel);
+    var url = 'http://localhost:3030/api/ds/query';
+    console.log('Response from backend srv', Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data));
+    /*if (isStreaming) {
+      console.log('inside doReq', text);
+      console.log('Response from backend srv', getBackendSrv().post(url, data));
       isStreaming = false;
     } else {
       //isStreaming = true;
-      console.log("Is streaming is false now");
-      var da = {
-        queries: [{
-          //queryText:
-          //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-          queryText: text,
-          datasourceId: 5,
-          withStreaming: true,
-          queryType: "new"
-        }]
+      console.log('Is streaming is false now');
+      const da = {
+        queries: [
+          {
+            //queryText:
+            //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+            queryText: text,
+            datasourceId: 5,
+            withStreaming: true,
+            queryType: 'new',
+          },
+        ],
       };
-      console.log("Response from backend srv first");
-      Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, da)["catch"](function (err) {
-        console.log("In catch", err);
-      }); //isStreaming = true;
+      console.log('Response from backend srv first');
+      getBackendSrv()
+        .post(url, da)
+        .catch((err) => {
+          console.log('In catch', err);
+        });
+      //isStreaming = true;
       //console.log(res.then((data) => console.log(data.value)));
-
       /*const dat = {
         queries: [
           {
@@ -9600,13 +9605,14 @@ function (_super) {
       //data.queries[0].withStreaming = true;
       //console.log("Response from backend srv second", getBackendSrv().post(url, data));
       } */
-    }
   };
 
-  DataSource.prototype.doWebsocket = function () {
-    //console.log(super.query(req));git
-    var channel = "ds/fLpie8B7k/stream";
-    var addr = Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["parseLiveChannelAddress"])(channel);
+  DataSource.prototype.doWebsocket = function (channel) {
+    //console.log(super.query(req));
+    var channelNew = "ds/qbvV-pL7z/" + channel; //const channel = 'ds/fLpie8B7k/stream';
+
+    console.log(channelNew);
+    var addr = Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["parseLiveChannelAddress"])(channelNew);
     console.log(addr);
     console.log(Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["isValidLiveChannelAddress"])(addr));
     return Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getGrafanaLiveSrv"])().getDataStream({
@@ -9626,94 +9632,109 @@ function (_super) {
     var _this = this;
 
     var observables = options.targets.map(function (target) {
-      var _a, _b, _c, _d, _e, _f, _g; //let return_list: Observable<DataQueryResponse>[] = [];
+      var _a, _b, _c, _d, _e, _f, _g, _h; //let return_list: Observable<DataQueryResponse>[] = [];
 
 
       var query = Object(lodash__WEBPACK_IMPORTED_MODULE_6__["defaults"])(target, _types__WEBPACK_IMPORTED_MODULE_3__["defaultQuery"]);
 
-      if (query.http_method === "GET") {
+      if (query.http_method === 'GET') {
         if ((_a = query.route) === null || _a === void 0 ? void 0 : _a.match(/^\/platforms\/.+\/pubsub\/?$/)) {
-          console.log("This is query params", query.query_params);
+          console.log('This is query params', query.query_params);
           var temp = query.query_params;
 
           if (!!temp) {
-            var rou = "ws://localhost:8080/vui" + query.route + "/" + query.query_params;
+            var rou = 'ws://localhost:8080/vui' + query.route + '/' + query.query_params;
+            var chan = (_b = query.query_params) === null || _b === void 0 ? void 0 : _b.replace(/[\/]/g, '');
             console.log(rou);
-            console.log("This is the query inside query", query);
+            console.log('This is the chan variable', chan);
+            console.log('This is the query inside query', query);
 
-            _this.doReq(rou);
+            _this.doReq(rou, chan); //this.sleep(3000);
 
-            _this.sleep(3000);
-
-            var data = {
-              queries: [{
-                //queryText:
-                //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-                queryText: rou,
-                datasourceId: 5,
-                withStreaming: true
-              }]
+            /*const data = {
+              queries: [
+                {
+                  //queryText:
+                  //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                  queryText: rou,
+                  datasourceId: 5,
+                  withStreaming: true,
+                },
+              ],
             };
-            var url = "http://localhost:3030/api/ds/query";
-            console.log("Call from query", Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data).then(function () {
-              return _this.doWebsocket();
-            }));
-
-            _this.sleep(6000);
-
-            console.log("Calling websockets");
-
-            var reponse = _this.doWebsocket(); //const rep = super.query(options);
-            //console.log("This is rep", rep);
+            const url = 'http://localhost:3030/api/ds/query';
+            console.log(
+              'Call from query',
+              getBackendSrv()
+                .post(url, data)
+                .then(() => this.doWebsocket())
+            );*/
+            //this.sleep(6000);
 
 
-            console.log("This is response from inside the query", reponse);
-            return reponse; //const response = this.doRequest(query, 'websocket');
+            console.log('Calling websockets');
+
+            try {
+              var reponse = _this.doWebsocket(chan); //const rep = super.query(options);
+              //console.log("This is rep", rep);
+
+
+              console.log('This is response from inside the query', reponse); //return this.process_device_ts(query, options, reponse);
+              //return this.process_device_ts(query, options, reponse);
+
+              var routes_observable = _this.process_route_options(query, options, reponse);
+
+              return routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, reponse)));
+            } catch (err) {
+              console.log('This is the err', err);
+              return err;
+            } //const response = this.doRequest(query, 'websocket');
             //return this.process_pubsub_ts(query, options, response);
+
           }
         }
 
-        if ((_b = query.route) === null || _b === void 0 ? void 0 : _b.match(/^\/platforms\/.+\/pubsub\/.+\/?$/)) {
+        if ((_c = query.route) === null || _c === void 0 ? void 0 : _c.match(/^\/platforms\/.+\/pubsub\/.+\/?$/)) {
           //const response = this.doRequest(query, "websocket");
           // this.alert_on_error(response);
           // this.log_all_nexts(response);
-          return "Nothing";
+          return 'Nothing';
         } else {
           // this.alert_on_error(response);
           // this.log_all_nexts(response);
-          if ((_c = query.route) === null || _c === void 0 ? void 0 : _c.match(/^\/platforms\/.+\/historians\/.+\/topics\/.+\/?$/)) {
+          if ((_d = query.route) === null || _d === void 0 ? void 0 : _d.match(/^\/platforms\/.+\/historians\/.+\/topics\/.+\/?$/)) {
             if (options.range) {
-              query.route = query.route + "?start=" + ((_d = options.range.from) === null || _d === void 0 ? void 0 : _d.format());
-              query.route = query.route + "&end=" + ((_e = options.range.to) === null || _e === void 0 ? void 0 : _e.format());
-              query.route = query.route + "&count=" + options.maxDataPoints;
-              query.route = query.route + "&order=" + "FIRST_TO_LAST"; // query.route = query.route + '&' + query.query_params;
+              query.route = query.route + '?start=' + ((_e = options.range.from) === null || _e === void 0 ? void 0 : _e.format());
+              query.route = query.route + '&end=' + ((_f = options.range.to) === null || _f === void 0 ? void 0 : _f.format());
+              query.route = query.route + '&count=' + options.maxDataPoints;
+              query.route = query.route + '&order=' + 'FIRST_TO_LAST'; // query.route = query.route + '&' + query.query_params;
 
               if (query.query_params) {
-                query.route = query.route + "&" + query.query_params;
+                query.route = query.route + '&' + query.query_params;
               }
             }
 
-            var response = _this.doRequest(query, "http");
+            var response = _this.doRequest(query, 'http');
 
             var routes_observable = _this.process_route_options(query, options, response);
 
             return routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_historian_ts(query, options, response)));
-          } else if ((_f = query.route) === null || _f === void 0 ? void 0 : _f.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
-            query.route = query.route + "?" + query.query_params;
+          } else if ((_g = query.route) === null || _g === void 0 ? void 0 : _g.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
+            query.route = query.route + '?' + query.query_params;
 
-            var response = _this.doRequest(query, "http");
+            var response = _this.doRequest(query, 'http');
 
             var routes_observable = _this.process_route_options(query, options, response);
 
             return routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, response)));
-          } else if ((_g = query.route) === null || _g === void 0 ? void 0 : _g.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
-            var response = _this.doRequest(query, "http");
+          } else if ((_h = query.route) === null || _h === void 0 ? void 0 : _h.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
+            var response = _this.doRequest(query, 'http');
 
             var routes_observable = _this.process_route_options(query, options, response);
 
             return routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_platform_agents_rpc_method(query, options, response)));
           } else {
-            var response = _this.doRequest(query, "http");
+            var response = _this.doRequest(query, 'http');
 
             var routes_observable = _this.process_route_options(query, options, response);
 
@@ -9721,12 +9742,12 @@ function (_super) {
           }
         }
       } else {
-        var response = _this.doRequest(query, "http");
+        var response = _this.doRequest(query, 'http');
 
         return _this.process_generic(query, options, response);
       }
     });
-    console.log("observables is:");
+    console.log('observables is:');
     console.log(observables);
     return observables[0];
   };
@@ -9736,12 +9757,12 @@ function (_super) {
       var frame = new _grafana_data__WEBPACK_IMPORTED_MODULE_1__["MutableDataFrame"]({
         refId: query.refId,
         fields: [{
-          name: " ",
+          name: ' ',
           type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].other
         }]
       });
       frame.add({
-        " ": "No data"
+        ' ': 'No data'
       });
       subscriber.next({
         data: [frame],
@@ -9758,8 +9779,8 @@ function (_super) {
         return [2
         /*return*/
         , {
-          status: "success",
-          message: "Success"
+          status: 'success',
+          message: 'Success'
         }];
       });
     });
@@ -9807,11 +9828,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defaultQuery", function() { return defaultQuery; });
 var defaultQuery = {
   //constant: 6.5,
-  http_method: "GET",
-  route: "",
+  http_method: 'GET',
+  route: '',
   withStreaming: false,
-  queryText: "",
-  query_params: ""
+  queryText: '',
+  query_params: ''
 };
 
 /***/ }),

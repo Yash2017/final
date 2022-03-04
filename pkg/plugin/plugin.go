@@ -80,14 +80,15 @@ type qModel struct {
 }
 
 var st = ""
-var stop = make(chan bool)
+
+//var stop = make(chan bool)
 
 //var que string = ""
 
 func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	response := backend.DataResponse{}
 	//log.DefaultLogger.Info("query is ", query.JSON)
-	stop <- false
+	//stop <- false
 	qu, err := jsonparser.GetString(query.JSON, "queryText")
 	//que.fin := string(que.quer)
 	//que := string(quer)
@@ -130,14 +131,14 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 		channel := live.Channel{
 			Scope:     live.ScopeDatasource,
 			Namespace: pCtx.DataSourceInstanceSettings.UID,
-			Path:      "stream",
+			Path:      query.QueryType,
 		}
 		frame.SetMeta(&data.FrameMeta{Channel: channel.String()})
 	}
-	if query.QueryType == "new" {
+	/*if query.QueryType == "new" {
 		log.DefaultLogger.Info("Inside the if Function")
 		stop <- true
-	}
+	}*/
 	// add the frames to the response.
 	response.Frames = append(response.Frames, frame)
 
@@ -165,11 +166,11 @@ func (d *SampleDatasource) CheckHealth(_ context.Context, req *backend.CheckHeal
 func (d *SampleDatasource) SubscribeStream(_ context.Context, req *backend.SubscribeStreamRequest) (*backend.SubscribeStreamResponse, error) {
 	log.DefaultLogger.Info("SubscribeStream called", "request", req)
 
-	status := backend.SubscribeStreamStatusPermissionDenied
-	if req.Path == "stream" {
-		// Allow subscribing only on expected path.
-		status = backend.SubscribeStreamStatusOK
-	}
+	status := backend.SubscribeStreamStatusOK
+	//if req.Path == "stream" {
+	// Allow subscribing only on expected path.
+	//	status = backend.SubscribeStreamStatusOK
+	//}
 	return &backend.SubscribeStreamResponse{
 		Status: status,
 	}, nil
@@ -233,12 +234,12 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 	// Stream data frames periodically till stream closed by Grafana.
 	for {
 		select {
-		case abc := <-stop:
-			if abc == true {
-				ct, cancel := context.WithCancel(ctx)
-				log.DefaultLogger.Info(ct.Err().Error())
-				cancel()
-			}
+		/*case abc := <-stop:
+		if abc == true {
+			ct, cancel := context.WithCancel(ctx)
+			log.DefaultLogger.Info(ct.Err().Error())
+			cancel()
+		}*/
 		case <-ctx.Done():
 			log.DefaultLogger.Info("Context done, finish streaming", "path", req.Path)
 			return nil
