@@ -2,8 +2,10 @@ package plugin
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	//"math/rand"
 	"time"
@@ -201,6 +203,7 @@ func DoneAsync(val chan []byte) {
 	retMsg := make([]byte, 5096)
 	for {
 		n, err = ws.Read(retMsg)
+		//log.DefaultLogger.Info("This is the retMsg", retMsg)
 		val <- retMsg[:n]
 		//log.DefaultLogger.Info("This is the response", string(<-val))
 
@@ -227,7 +230,7 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 		data.NewField("time", nil, make([]time.Time, 1)),
 		data.NewField("values", nil, make([]string, 1)),
 	)
-	counter := 0
+	//counter := 0
 	val := make(chan []byte, 5096)
 	go DoneAsync(val)
 	//log.DefaultLogger.Info("This is the val variable", string(<-val))
@@ -246,13 +249,25 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 		case al := <-val:
 			// Send new data periodically.
 			//log.DefaultLogger.Info("This is the strn variable", string(al))
-			frame.Fields[0].Set(0, time.Now())
-			frame.Fields[1].Set(0, string(al))
-
-			counter++
-
-			err := sender.SendFrame(frame, data.IncludeAll)
+			//frame.Fields[0].Set(0, time.Now())
+			//frame.Fields[1].Set(0, string(al))
+			//log.DefaultLogger.Info("this is al", string(al))
+			//counter++
+			log.DefaultLogger.Info("This is al", `"`+string(al)+`"`)
+			unquote, erro := strconv.Unquote(`"` + string(al) + `"`)
+			if erro != nil {
+				log.DefaultLogger.Error("Error unquoting", "error", erro)
+				continue
+			}
+			//decodeval := make([]byte, base64.StdEncoding.DecodedLen(len(al)))
+			decode, err := base64.StdEncoding.DecodeString(unquote)
+			log.DefaultLogger.Info("decode this", decode)
 			if err != nil {
+				log.DefaultLogger.Error("Error decoding", "error", err)
+				continue
+			}
+			errr := sender.SendJSON(decode)
+			if errr != nil {
 				log.DefaultLogger.Error("Error sending frame", "error", err)
 				continue
 			}

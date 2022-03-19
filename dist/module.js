@@ -9248,6 +9248,7 @@ function (_super) {
         return Object(lodash__WEBPACK_IMPORTED_MODULE_6__["isEmpty"])(x.data.route_options);
       })).subscribe({
         next: function next(x) {
+          console.log('This is x', x);
           frame.add({
             'Response Value': JSON.stringify(x.data)
           });
@@ -9464,6 +9465,7 @@ function (_super) {
           console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
         },
         complete: function complete() {
+          console.log('Inside the ps_devices endpoint', subscriber);
           subscriber.complete();
         }
       });
@@ -9681,10 +9683,12 @@ function (_super) {
 
               console.log('This is response from inside the query', reponse); //return this.process_device_ts(query, options, reponse);
               //return this.process_device_ts(query, options, reponse);
+              //const routes_observable = this.process_route_options(query, options, reponse);
 
-              var routes_observable = _this.process_route_options(query, options, reponse);
+              var rep = _this.process_generic(query, options, reponse);
 
-              return routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, reponse)));
+              console.log('this is rep', rep);
+              return rep;
             } catch (err) {
               console.log('This is the err', err);
               return err;

@@ -99,7 +99,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   process_generic(
     query: MyQuery,
     options: DataQueryRequest,
-    response: Observable<FetchResponse>
+    response: Observable<FetchResponse | DataQueryResponse>
   ): Observable<DataQueryResponse> {
     console.log('IN PROCESS_GENERIC');
     return new Observable<DataQueryResponse>((subscriber) => {
@@ -109,7 +109,9 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
       });
       response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
         next(x) {
+          console.log('This is x', x);
           frame.add({ 'Response Value': JSON.stringify(x.data) });
+
           subscriber.next({
             data: [frame],
             key: query.refId,
@@ -276,6 +278,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
         },
         complete() {
+          console.log('Inside the ps_devices endpoint', subscriber);
           subscriber.complete();
         },
       });
@@ -476,7 +479,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
               //return this.process_device_ts(query, options, reponse);
               //return this.process_device_ts(query, options, reponse);
               //const routes_observable = this.process_route_options(query, options, reponse);
-              return this.process_device_ts(query, options, reponse);
+
+              const rep = this.process_generic(query, options, reponse);
+              console.log('this is rep', rep);
+              return rep;
             } catch (err) {
               console.log('This is the err', err);
               return err;
