@@ -109,7 +109,10 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
       });
       response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
         next(x) {
-          console.log('This is x', x);
+          /*console.log(
+            'This is x',
+            x.data[0].fields[1].values.buffer.map((ind: any) => console.log('this is the individual', ind))
+          );*/
           frame.add({ 'Response Value': JSON.stringify(x.data) });
 
           subscriber.next({
@@ -269,6 +272,82 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
             }
           }
           frame.add(row);
+          console.log('Device dataframe');
+          console.log(frame);
+          subscriber.next({
+            data: [frame],
+            key: query.refId,
+          });
+        },
+        error(err) {
+          console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
+        },
+        complete() {
+          console.log('Inside the ps_devices endpoint', subscriber);
+          subscriber.complete();
+        },
+      });
+    });
+  }
+
+  process_device_websocket_ts(
+    query: MyQuery,
+    options: DataQueryRequest,
+    response: Observable<FetchResponse | DataQueryResponse>
+  ): Observable<DataQueryResponse> {
+    /*return new Observable<DataQueryResponse>((subscriber) => {
+      const frame = new MutableDataFrame({
+        refId: query.refId,
+        fields: [{ name: 'Response Value', type: FieldType.string }],
+      });
+      response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
+        next(x) {
+          console.log(
+            'This is x',
+            x.data[0].fields[1].values.buffer.map((ind: any) => console.log('this is the individual', ind))
+          );
+          frame.add({ 'Response Value': JSON.stringify(x.data) });
+
+          subscriber.next({
+            data: [frame],
+            key: query.refId,
+          });
+        },
+      });
+    });*/
+    console.log('IN PROCESS_DEVICE_TS');
+    return new Observable<DataQueryResponse>((subscriber) => {
+      const frame = new CircularDataFrame({
+        append: 'tail',
+        capacity: 1,
+      });
+      response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
+        next(x) {
+          const entries: any = Object.entries(x.data);
+          const unique_seg = first_unique_segment(entries);
+          if (frame.fields.length === 0) {
+            frame.refId = query.refId;
+            frame.addField({ name: 'Time', type: FieldType.time });
+            for (const [topic, data] of entries) {
+              const field_name = topic.split('/').slice(unique_seg).join('/') || '';
+              const first_value = data.value;
+              frame.addField({
+                name: field_name,
+                type: guessFieldTypeFromValue(first_value),
+              });
+            }
+          }
+          const row: any = {};
+          row['Time'] = Date.now();
+          for (let topic in x.data) {
+            if (!['metadata', 'units', 'type', 'tz'].includes(topic)) {
+              const field_name = topic.split('/').slice(unique_seg).join('/') || '';
+              row[field_name] = x.data[topic]['value'];
+            }
+          }
+          frame.add(row);
+          console.log('Device dataframe');
+          console.log(frame);
           subscriber.next({
             data: [frame],
             key: query.refId,
@@ -480,9 +559,9 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
               //return this.process_device_ts(query, options, reponse);
               //const routes_observable = this.process_route_options(query, options, reponse);
 
-              const rep = this.process_generic(query, options, reponse);
-              console.log('this is rep', rep);
-              return rep;
+              //const rep = this.process_generic(query, options, reponse);
+              //console.log('this is rep', rep);
+              return reponse;
             } catch (err) {
               console.log('This is the err', err);
               return err;

@@ -2,10 +2,12 @@ package plugin
 
 import (
 	"context"
-	"encoding/base64"
+
+	//"encoding/base64"
 	"encoding/json"
 	"net/http"
-	"strconv"
+
+	//"strconv"
 
 	//"math/rand"
 	"time"
@@ -124,6 +126,7 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 	frame.Fields = append(frame.Fields,
 		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
 		data.NewField("values", nil, []int64{10, 20}),
+		data.NewField("test", nil, make([]string, 1)),
 	)
 
 	// If query called with streaming on then return a channel
@@ -228,7 +231,7 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 	// Add fields (matching the same schema used in QueryData).
 	frame.Fields = append(frame.Fields,
 		data.NewField("time", nil, make([]time.Time, 1)),
-		data.NewField("values", nil, make([]string, 1)),
+		data.NewField("val", nil, make([]string, 1)),
 	)
 	//counter := 0
 	val := make(chan []byte, 5096)
@@ -249,25 +252,37 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 		case al := <-val:
 			// Send new data periodically.
 			//log.DefaultLogger.Info("This is the strn variable", string(al))
-			//frame.Fields[0].Set(0, time.Now())
-			//frame.Fields[1].Set(0, string(al))
+			stringAl := string(al)
+			var jsonMap []map[string]interface{}
+			errr := json.Unmarshal([]byte(stringAl), &jsonMap)
+			log.DefaultLogger.Info("this is the error", errr)
+			log.DefaultLogger.Info("This is json", jsonMap[0])
+			log.DefaultLogger.Info("This is string al", stringAl)
+			var i = 3
+			frame.Fields[0].Set(0, time.Now())
+			for key := range jsonMap[0] {
+				log.DefaultLogger.Info(key)
+				//log.DefaultLogger.Info(element)
+
+				//data.NewField(string(key), nil, make([]string, 1))
+				frame.Fields[1].Set(0, string(key))
+				i++
+				log.DefaultLogger.Info("This is i", string(i))
+			}
+			/*for j := range jsonMap[0] {
+				log.DefaultLogger.Info(j)
+				log.DefaultLogger.Info("Indi", jsonMap[0][j])
+				frame.Fields = append(frame.Fields, data.NewField(j, nil, jsonMap[0][j]))
+			}*/
+			//			frame.Fields = append(frame.Fields, data.NewField("test", nil, make([]string, 1)))
+			//			frame.Fields[1].Set(0, string(al))
+			//			frame.Fields[2].Set(0, "test")
+
 			//log.DefaultLogger.Info("this is al", string(al))
 			//counter++
-			log.DefaultLogger.Info("This is al", `"`+string(al)+`"`)
-			unquote, erro := strconv.Unquote(`"` + string(al) + `"`)
-			if erro != nil {
-				log.DefaultLogger.Error("Error unquoting", "error", erro)
-				continue
-			}
-			//decodeval := make([]byte, base64.StdEncoding.DecodedLen(len(al)))
-			decode, err := base64.StdEncoding.DecodeString(unquote)
-			log.DefaultLogger.Info("decode this", decode)
+			log.DefaultLogger.Info("This is the frame", frame)
+			err := sender.SendFrame(frame, data.IncludeAll)
 			if err != nil {
-				log.DefaultLogger.Error("Error decoding", "error", err)
-				continue
-			}
-			errr := sender.SendJSON(decode)
-			if errr != nil {
 				log.DefaultLogger.Error("Error sending frame", "error", err)
 				continue
 			}

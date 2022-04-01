@@ -9248,7 +9248,10 @@ function (_super) {
         return Object(lodash__WEBPACK_IMPORTED_MODULE_6__["isEmpty"])(x.data.route_options);
       })).subscribe({
         next: function next(x) {
-          console.log('This is x', x);
+          /*console.log(
+            'This is x',
+            x.data[0].fields[1].values.buffer.map((ind: any) => console.log('this is the individual', ind))
+          );*/
           frame.add({
             'Response Value': JSON.stringify(x.data)
           });
@@ -9456,6 +9459,105 @@ function (_super) {
           }
 
           frame.add(row);
+          console.log('Device dataframe');
+          console.log(frame);
+          subscriber.next({
+            data: [frame],
+            key: query.refId
+          });
+        },
+        error: function error(err) {
+          console.log('ERROR FROM process_device_ts.subscribe(): ' + err);
+        },
+        complete: function complete() {
+          console.log('Inside the ps_devices endpoint', subscriber);
+          subscriber.complete();
+        }
+      });
+    });
+  };
+
+  DataSource.prototype.process_device_websocket_ts = function (query, options, response) {
+    /*return new Observable<DataQueryResponse>((subscriber) => {
+      const frame = new MutableDataFrame({
+        refId: query.refId,
+        fields: [{ name: 'Response Value', type: FieldType.string }],
+      });
+      response.pipe(filter((x) => isEmpty(x.data.route_options))).subscribe({
+        next(x) {
+          console.log(
+            'This is x',
+            x.data[0].fields[1].values.buffer.map((ind: any) => console.log('this is the individual', ind))
+          );
+          frame.add({ 'Response Value': JSON.stringify(x.data) });
+               subscriber.next({
+            data: [frame],
+            key: query.refId,
+          });
+        },
+      });
+    });*/
+    console.log('IN PROCESS_DEVICE_TS');
+    return new rxjs__WEBPACK_IMPORTED_MODULE_4__["Observable"](function (subscriber) {
+      var frame = new _grafana_data__WEBPACK_IMPORTED_MODULE_1__["CircularDataFrame"]({
+        append: 'tail',
+        capacity: 1
+      });
+      response.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["filter"])(function (x) {
+        return Object(lodash__WEBPACK_IMPORTED_MODULE_6__["isEmpty"])(x.data.route_options);
+      })).subscribe({
+        next: function next(x) {
+          var e_3, _a;
+
+          var entries = Object.entries(x.data);
+          var unique_seg = first_unique_segment(entries);
+
+          if (frame.fields.length === 0) {
+            frame.refId = query.refId;
+            frame.addField({
+              name: 'Time',
+              type: _grafana_data__WEBPACK_IMPORTED_MODULE_1__["FieldType"].time
+            });
+
+            try {
+              for (var entries_3 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__values"])(entries), entries_3_1 = entries_3.next(); !entries_3_1.done; entries_3_1 = entries_3.next()) {
+                var _b = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__read"])(entries_3_1.value, 2),
+                    topic = _b[0],
+                    data = _b[1];
+
+                var field_name = topic.split('/').slice(unique_seg).join('/') || '';
+                var first_value = data.value;
+                frame.addField({
+                  name: field_name,
+                  type: Object(_grafana_data__WEBPACK_IMPORTED_MODULE_1__["guessFieldTypeFromValue"])(first_value)
+                });
+              }
+            } catch (e_3_1) {
+              e_3 = {
+                error: e_3_1
+              };
+            } finally {
+              try {
+                if (entries_3_1 && !entries_3_1.done && (_a = entries_3["return"])) _a.call(entries_3);
+              } finally {
+                if (e_3) throw e_3.error;
+              }
+            }
+          }
+
+          var row = {};
+          row['Time'] = Date.now();
+
+          for (var topic in x.data) {
+            if (!['metadata', 'units', 'type', 'tz'].includes(topic)) {
+              var field_name = topic.split('/').slice(unique_seg).join('/') || '';
+              row[field_name] = x.data[topic]['value'];
+            }
+          }
+
+          frame.add(row);
+          console.log('Device dataframe');
+          console.log(frame);
           subscriber.next({
             data: [frame],
             key: query.refId
@@ -9684,11 +9786,10 @@ function (_super) {
               console.log('This is response from inside the query', reponse); //return this.process_device_ts(query, options, reponse);
               //return this.process_device_ts(query, options, reponse);
               //const routes_observable = this.process_route_options(query, options, reponse);
+              //const rep = this.process_generic(query, options, reponse);
+              //console.log('this is rep', rep);
 
-              var rep = _this.process_generic(query, options, reponse);
-
-              console.log('this is rep', rep);
-              return rep;
+              return reponse;
             } catch (err) {
               console.log('This is the err', err);
               return err;
