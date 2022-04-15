@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"reflect"
 
 	//"encoding/base64"
 	"encoding/json"
@@ -226,13 +227,36 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 	log.DefaultLogger.Info("RunStream called", "request", req)
 
 	// Create the same data frame as for query data.
-	frame := data.NewFrame("response")
+	//frame := data.NewFrame("response")
 
 	// Add fields (matching the same schema used in QueryData).
-	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, make([]time.Time, 1)),
-		data.NewField("val", nil, make([]string, 1)),
-	)
+	//frame.Fields = append(frame.Fields,
+	//data.NewField("time", nil, make([]time.Time, 1)),
+	//data.NewField("value", nil, make([]string, 1)),
+	/*data.NewField("OutsideAirTemperature1", nil, make([]string, 1)),
+	data.NewField("SampleLong1", nil, make([]string, 1)),
+	data.NewField("SampleBool1", nil, make([]string, 1)),
+	data.NewField("OutsideAirTemperature2", nil, make([]string, 1)),
+	data.NewField("SampleLong2", nil, make([]string, 1)),
+	data.NewField("SampleBool2", nil, make([]string, 1)),
+	data.NewField("OutsideAirTemperature3", nil, make([]string, 1)),
+	data.NewField("SampleLong3", nil, make([]string, 1)),
+	data.NewField("SampleBool3", nil, make([]string, 1)),
+	data.NewField("Heartbeat", nil, make([]string, 1)),
+	data.NewField("EKG", nil, make([]string, 1)),
+	data.NewField("SampleWritableFloat1", nil, make([]string, 1)),
+	data.NewField("SampleWritableShort1", nil, make([]string, 1)),
+	data.NewField("SampleWritableFloat2", nil, make([]string, 1)),
+	data.NewField("SampleWritableShort2", nil, make([]string, 1)),
+	data.NewField("SampleWritableBool2", nil, make([]string, 1)),
+	data.NewField("SampleWritableFloat3", nil, make([]string, 1)),
+	data.NewField("SampleWritableShort3", nil, make([]string, 1)),
+	data.NewField("SampleWritableBool3", nil, make([]string, 1)),
+	data.NewField("PowerState", nil, make([]string, 1)),
+	data.NewField("ValveState", nil, make([]string, 1)),
+	data.NewField("EKG_Sin", nil, make([]string, 1)),
+	data.NewField("EKG_Cos", nil, make([]string, 1)),*/
+	//)
 	//counter := 0
 	val := make(chan []byte, 5096)
 	go DoneAsync(val)
@@ -250,6 +274,9 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 			log.DefaultLogger.Info("Context done, finish streaming", "path", req.Path)
 			return nil
 		case al := <-val:
+			frame := data.NewFrame("response")
+			frame.Fields = append(frame.Fields,
+				data.NewField("time", nil, make([]time.Time, 1)))
 			// Send new data periodically.
 			//log.DefaultLogger.Info("This is the strn variable", string(al))
 			stringAl := string(al)
@@ -258,17 +285,37 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 			log.DefaultLogger.Info("this is the error", errr)
 			log.DefaultLogger.Info("This is json", jsonMap[0])
 			log.DefaultLogger.Info("This is string al", stringAl)
-			var i = 3
+			var i = 1
 			frame.Fields[0].Set(0, time.Now())
-			for key := range jsonMap[0] {
+			for key, element := range jsonMap[0] {
 				log.DefaultLogger.Info(key)
-				//log.DefaultLogger.Info(element)
+				//log.DefaultLogger.Info(string(element))
+				str, ok := element.(string)
+				if ok {
+					log.DefaultLogger.Info("This is a string", str)
+				}
+				log.DefaultLogger.Info("type of value", reflect.TypeOf(element).String())
 
-				//data.NewField(string(key), nil, make([]string, 1))
-				frame.Fields[1].Set(0, string(key))
-				i++
-				log.DefaultLogger.Info("This is i", string(i))
+				//if i <= 23 {
+				if reflect.TypeOf(element).String() == "bool" {
+					frame.Fields = append(frame.Fields,
+						data.NewField(string(key), nil, make([]bool, 1)))
+					frame.Fields[i].Set(0, true)
+					i++
+					log.DefaultLogger.Info("This is inside bool i", string(i))
+				}
+				if reflect.TypeOf(element).String() == "float64" {
+					frame.Fields = append(frame.Fields,
+						data.NewField(string(key), nil, make([]float64, 1)))
+
+					frame.Fields[i].Set(0, element)
+					i++
+					log.DefaultLogger.Info("This is inside float i", string(i))
+				}
+				//}
+
 			}
+			i = 1
 			/*for j := range jsonMap[0] {
 				log.DefaultLogger.Info(j)
 				log.DefaultLogger.Info("Indi", jsonMap[0][j])
