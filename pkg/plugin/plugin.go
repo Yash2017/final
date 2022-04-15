@@ -13,6 +13,8 @@ import (
 	//"math/rand"
 	"time"
 
+	"sort"
+
 	"github.com/buger/jsonparser"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -287,26 +289,40 @@ func (d *SampleDatasource) RunStream(ctx context.Context, req *backend.RunStream
 			log.DefaultLogger.Info("This is string al", stringAl)
 			var i = 1
 			frame.Fields[0].Set(0, time.Now())
-			for key, element := range jsonMap[0] {
-				log.DefaultLogger.Info(key)
-				//log.DefaultLogger.Info(string(element))
-				str, ok := element.(string)
-				if ok {
-					log.DefaultLogger.Info("This is a string", str)
-				}
-				log.DefaultLogger.Info("type of value", reflect.TypeOf(element).String())
+			keys := make([]string, 0, len(jsonMap[0]))
+			for k := range jsonMap[0] {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+			log.DefaultLogger.Info(keys[0])
 
-				//if i <= 23 {
+			for _, k := range keys {
+				//fmt.Println(k, population[k])
+				log.DefaultLogger.Info("Value in the array is ", k, jsonMap[0][k])
+
+			}
+			//for key, element := range jsonMap[0] {
+			for _, k := range keys {
+				log.DefaultLogger.Info(k)
+				//log.DefaultLogger.Info(string(element))
+				//str, ok := element.(string)
+				//if ok {
+				//	log.DefaultLogger.Info("This is a string", str)
+				//}
+				//log.DefaultLogger.Info("type of value", reflect.TypeOf(element).String())
+
+				var element = jsonMap[0][k]
+
 				if reflect.TypeOf(element).String() == "bool" {
 					frame.Fields = append(frame.Fields,
-						data.NewField(string(key), nil, make([]bool, 1)))
+						data.NewField(string(k), nil, make([]bool, 1)))
 					frame.Fields[i].Set(0, true)
 					i++
 					log.DefaultLogger.Info("This is inside bool i", string(i))
 				}
 				if reflect.TypeOf(element).String() == "float64" {
 					frame.Fields = append(frame.Fields,
-						data.NewField(string(key), nil, make([]float64, 1)))
+						data.NewField(string(k), nil, make([]float64, 1)))
 
 					frame.Fields[i].Set(0, element)
 					i++
