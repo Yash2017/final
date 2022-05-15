@@ -1,7 +1,7 @@
 import React, { ChangeEvent, PureComponent } from 'react';
 import { LegacyForms } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { MyDataSourceOptions, MySecureJsonData } from './types';
+import { MyDataSourceOptions } from './types';
 
 const { SecretFormField, FormField } = LegacyForms;
 
@@ -31,12 +31,17 @@ export class ConfigEditor extends PureComponent<Props, State> {
   // Secure field (only sent to the backend)
   onPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
-    onOptionsChange({
-      ...options,
-      secureJsonData: {
-        password: event.target.value,
-      },
-    });
+    const jsonData = {
+      ...options.jsonData,
+      password: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+    // onOptionsChange({
+    //   ...options,
+    //   secureJsonData: {
+    //     password: event.target.value,
+    //   },
+    // });
   };
 
   onResetAPIKey = () => {
@@ -57,7 +62,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
   render() {
     const { options } = this.props;
     const { jsonData, secureJsonFields } = options;
-    const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
+    //const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
 
     return (
       <div className="gf-form-group">
@@ -87,7 +92,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
           <div className="gf-form">
             <SecretFormField
               isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
-              value={secureJsonData.password || ''}
+              value={jsonData.password || ''}
               label="Password"
               placeholder="secure json field (backend only)"
               labelWidth={6}

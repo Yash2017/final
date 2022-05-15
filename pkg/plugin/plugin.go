@@ -105,10 +105,26 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 		log.DefaultLogger.Info("JsonParser error is", err)
 	}
 	log.DefaultLogger.Info("This is the st string", st)
-	//dat, err := base64.StdEncoding.DecodeString(string(val))
-	//if err != nil {
-	//
-	//}
+	log.DefaultLogger.Info("This is the value")
+
+	//som := jsonMap["data"]
+	//log.DefaultLogger.Info("This is json Map", st)
+	// keys := make([]string, 0, len(jsonMap["data"]))
+	// for k := range jsonMap["data"] {
+	// 	keys = append(keys, k)
+	// }
+	// sort.Strings(keys)
+	// log.DefaultLogger.Info(keys[0])
+
+	// for _, k := range keys {
+	// 	//fmt.Println(k, population[k])
+	// 	log.DefaultLogger.Info("Value in the array is ", k, jsonMap["data"][k])
+
+	// }
+	// dat, err := base64.StdEncoding.DecodeString(string(val))
+	// if err != nil {
+
+	// }
 
 	//log.DefaultLogger.Info("This is the val string after decoding", dat)
 	// Unmarshal the JSON into our queryModel.
@@ -125,12 +141,11 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 	// create data frame response.
 	frame := data.NewFrame("response")
 
-	// add fields.
 	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
-		data.NewField("values", nil, []int64{10, 20}),
-		data.NewField("test", nil, make([]string, 1)),
+		data.NewField("time", nil, make([]time.Time, 1)),
+		data.NewField("values", nil, make([]string, 1)),
 	)
+	frame.Fields[1].Set(0, st)
 
 	// If query called with streaming on then return a channel
 	// to subscribe on a client-side and consume updates from a plugin.

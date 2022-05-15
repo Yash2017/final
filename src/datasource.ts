@@ -11,7 +11,8 @@ import {
   parseLiveChannelAddress,
 } from '@grafana/data';
 import { FetchResponse, getBackendSrv, DataSourceWithBackend, getGrafanaLiveSrv } from '@grafana/runtime';
-import { defaultQuery, MyDataSourceOptions, MyQuery } from './types';
+//import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { defaultQuery, MyDataSourceOptions, MyQuery /*MySecureJsonData*/ } from './types';
 import { Observable } from 'rxjs';
 import { filter, merge } from 'rxjs/operators';
 import { defaults, isEmpty } from 'lodash';
@@ -29,6 +30,10 @@ function first_unique_segment(entries: any[][]) {
   return zipped.map((x) => x.every((y, i, arr) => y === arr[0])).indexOf(false);
 }
 //let isStreaming = true;
+// interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions, MySecureJsonData> {}
+var pass: any = null;
+//var instance: any = null;
+var userName: any = null;
 
 export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptions> {
   url?: string;
@@ -37,6 +42,11 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
     // super(instanceSettings);
+    //console.log(instanceSettings.password);
+    //pass = instanceSettings.password;
+    userName = instanceSettings.jsonData.username;
+    pass = instanceSettings.jsonData.password;
+    //instance = instanceSettings;
     this.url = instanceSettings.url;
     this.path = instanceSettings.jsonData.path || '';
   }
@@ -595,8 +605,46 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           } else if (query.route?.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
             query.route = query.route + '?' + query.query_params;
             const response = this.doRequest(query, 'http');
+
+            //console.log('Response from backend srv', getBackendSrv().post(url, data))
             const routes_observable = this.process_route_options(query, options, response);
-            return routes_observable.pipe(merge(this.process_device_ts(query, options, response)));
+            //var res: any;
+            response.subscribe({
+              next(x) {
+                const doSom = async () => {
+                  console.log('this is x', x);
+                  const u = String(x.url);
+                  console.log(u);
+                  const ind = u.indexOf('C');
+                  const final = u.substring(ind, u.length - 1);
+                  console.log(final);
+                  if (final.length > 24) {
+                    const newData: any = x.data;
+                    console.log(newData[final].value);
+                    const data = {
+                      queries: [
+                        {
+                          //queryText:
+                          //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                          queryText: String(newData[final].value),
+                          datasourceId: 7,
+                          withStreaming: false,
+                        },
+                      ],
+                    };
+                    const url = 'http://localhost:3030/api/ds/query';
+                    const res = await getBackendSrv().post(url, data);
+                    return res;
+                  }
+                };
+                doSom();
+              },
+            });
+            //console.log('this is the response', res);
+            const ab = routes_observable.pipe(merge(this.process_device_ts(query, options, response)));
+            console.log('This is the javascript response', ab);
+            //return res;
+            return ab;
           } else if (query.route?.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
             const response = this.doRequest(query, 'http');
             const routes_observable = this.process_route_options(query, options, response);
@@ -633,10 +681,33 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
   }
 
   async testDatasource() {
+    //console.log('This is the pass', pass);
+    //console.log('This is the username', userName);
+
+    // const response = await getBackendSrv().post('http://localhost:8080/authenticate', {
+    //   username: userName,
+    //   password: pass,
+    // });
+
+    const request: any = {
+      method: 'POST',
+      url: 'http://localhost:8080/authenticate',
+      data: { username: userName, password: pass },
+    };
+    const response = await getBackendSrv().fetch(request);
+    response.subscribe({
+      next(x) {
+        console.log(x);
+      },
+      error(x) {
+        console.error(x);
+      },
+    });
+    console.log(response);
     // Implement a health check for your data source.
     return {
-      status: 'success',
-      message: 'Success',
+      status: 'fail',
+      message: 'Fail',
     };
   }
 }

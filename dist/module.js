@@ -8577,11 +8577,19 @@ function (_super) {
       var _a = _this.props,
           onOptionsChange = _a.onOptionsChange,
           options = _a.options;
+
+      var jsonData = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options.jsonData), {
+        password: event.target.value
+      });
+
       onOptionsChange(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options), {
-        secureJsonData: {
-          password: event.target.value
-        }
-      }));
+        jsonData: jsonData
+      })); // onOptionsChange({
+      //   ...options,
+      //   secureJsonData: {
+      //     password: event.target.value,
+      //   },
+      // });
     };
 
     _this.onResetAPIKey = function () {
@@ -8604,8 +8612,8 @@ function (_super) {
   ConfigEditor.prototype.render = function () {
     var options = this.props.options;
     var jsonData = options.jsonData,
-        secureJsonFields = options.secureJsonFields;
-    var secureJsonData = options.secureJsonData || {};
+        secureJsonFields = options.secureJsonFields; //const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
+
     return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
       className: "gf-form-group"
     }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
@@ -8632,7 +8640,7 @@ function (_super) {
       className: "gf-form"
     }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(SecretFormField, {
       isConfigured: secureJsonFields && secureJsonFields.apiKey,
-      value: secureJsonData.password || '',
+      value: jsonData.password || '',
       label: "Password",
       placeholder: "secure json field (backend only)",
       labelWidth: 6,
@@ -9140,6 +9148,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
 
 
+ //import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 
 
 
@@ -9163,7 +9172,12 @@ function first_unique_segment(entries) {
     });
   }).indexOf(false);
 } //let isStreaming = true;
+// interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions, MySecureJsonData> {}
 
+
+var pass = null; //var instance: any = null;
+
+var userName = null;
 
 var DataSource =
 /** @class */
@@ -9172,7 +9186,12 @@ function (_super) {
 
   function DataSource(instanceSettings) {
     var _this = _super.call(this, instanceSettings) || this; // super(instanceSettings);
+    //console.log(instanceSettings.password);
+    //pass = instanceSettings.password;
 
+
+    userName = instanceSettings.jsonData.username;
+    pass = instanceSettings.jsonData.password; //instance = instanceSettings;
 
     _this.url = instanceSettings.url;
     _this.path = instanceSettings.jsonData.path || '';
@@ -9827,11 +9846,71 @@ function (_super) {
           } else if ((_g = query.route) === null || _g === void 0 ? void 0 : _g.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
             query.route = query.route + '?' + query.query_params;
 
-            var response = _this.doRequest(query, 'http');
+            var response = _this.doRequest(query, 'http'); //console.log('Response from backend srv', getBackendSrv().post(url, data))
 
-            var routes_observable = _this.process_route_options(query, options, response);
 
-            return routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, response)));
+            var routes_observable = _this.process_route_options(query, options, response); //var res: any;
+
+
+            response.subscribe({
+              next: function next(x) {
+                var _this = this;
+
+                var doSom = function doSom() {
+                  return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(_this, void 0, void 0, function () {
+                    var u, ind, _final, newData, data, url, res;
+
+                    return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
+                      switch (_a.label) {
+                        case 0:
+                          console.log('this is x', x);
+                          u = String(x.url);
+                          console.log(u);
+                          ind = u.indexOf('C');
+                          _final = u.substring(ind, u.length - 1);
+                          console.log(_final);
+                          if (!(_final.length > 24)) return [3
+                          /*break*/
+                          , 2];
+                          newData = x.data;
+                          console.log(newData[_final].value);
+                          data = {
+                            queries: [{
+                              //queryText:
+                              //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                              queryText: String(newData[_final].value),
+                              datasourceId: 7,
+                              withStreaming: false
+                            }]
+                          };
+                          url = 'http://localhost:3030/api/ds/query';
+                          return [4
+                          /*yield*/
+                          , Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data)];
+
+                        case 1:
+                          res = _a.sent();
+                          return [2
+                          /*return*/
+                          , res];
+
+                        case 2:
+                          return [2
+                          /*return*/
+                          ];
+                      }
+                    });
+                  });
+                };
+
+                doSom();
+              }
+            }); //console.log('this is the response', res);
+
+            var ab = routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, response)));
+            console.log('This is the javascript response', ab); //return res;
+
+            return ab;
           } else if ((_h = query.route) === null || _h === void 0 ? void 0 : _h.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
             var response = _this.doRequest(query, 'http');
 
@@ -9879,14 +9958,41 @@ function (_super) {
 
   DataSource.prototype.testDatasource = function () {
     return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
+      var request, response;
       return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
-        // Implement a health check for your data source.
-        return [2
-        /*return*/
-        , {
-          status: 'success',
-          message: 'Success'
-        }];
+        switch (_a.label) {
+          case 0:
+            request = {
+              method: 'POST',
+              url: 'http://localhost:8080/authenticate',
+              data: {
+                username: userName,
+                password: pass
+              }
+            };
+            return [4
+            /*yield*/
+            , Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().fetch(request)];
+
+          case 1:
+            response = _a.sent();
+            response.subscribe({
+              next: function next(x) {
+                console.log(x);
+              },
+              error: function error(x) {
+                console.error(x);
+              }
+            });
+            console.log(response); // Implement a health check for your data source.
+
+            return [2
+            /*return*/
+            , {
+              status: 'fail',
+              message: 'Fail'
+            }];
+        }
       });
     });
   };
