@@ -526,7 +526,6 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     const observables = options.targets.map((target) => {
       //let return_list: Observable<DataQueryResponse>[] = [];
       const query = defaults(target, defaultQuery);
-
       if (query.http_method === 'GET') {
         if (query.route?.match(/^\/platforms\/.+\/pubsub\/?$/)) {
           console.log('This is query params', query.query_params);
@@ -605,46 +604,74 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
           } else if (query.route?.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
             query.route = query.route + '?' + query.query_params;
             const response = this.doRequest(query, 'http');
+            //const routePath = '/vui';
+            const urlForData = 'http://localhost:8080/vui' + query.route;
+            console.log('This is full query route', urlForData);
+            const url = 'http://localhost:3030/api/ds/query';
+            if (urlForData.length > 97) {
+              const request: any = {
+                method: 'POST',
+                datasourceId: 7,
+                url: url,
+                data: {
+                  queries: [
+                    {
+                      //queryText:
+                      //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                      queryRoute: urlForData,
+                      datasourceId: 7,
+                      //withStreaming: false,
+                      // queryType: "addressForChannel",
+                    },
+                  ],
+                },
+              };
+              // const
+              // console.log(addressForChannel);
+              // const url = 'http://localhost:3030/api/ds/query';
+              // console.log('Response from backend srv', getBackendSrv().post(url, data));
+              const res = getBackendSrv().fetch(request);
+              res.subscribe({
+                next(x) {
+                  console.log('This is x', x);
+                },
+              });
+              const routes_observable = this.process_route_options(query, options, res);
+              const ab = routes_observable.pipe(merge(this.process_device_ts(query, options, res)));
+              return ab;
+            } else {
+              // const routePath = '/vuiwebsock';
+              // let url = this.url + routePath + '/vui' + query.route;
+              // getBackendSrv()
+              //   .get(url)
+              //   .then((res) => console.log("This is the response from get", res));
+              //console.log('Response from backend srv', getBackendSrv().post(url, data))
+              const routes_observable = this.process_route_options(query, options, response);
+              // var res: any;
+              // response.subscribe({
+              //   next(x) {
+              //     const doSom = async () => {
+              //       console.log('this is x', x);
+              //       const u = String(x.url);
+              //       console.log(u);
+              //       const ind = u.indexOf('C');
+              //       const final = u.substring(ind, u.length - 1);
+              //       console.log(final);
+              //       if (final.length > 24) {
+              //         const newData: any = x.data;
+              //         console.log(newData[final].value);
 
-            //console.log('Response from backend srv', getBackendSrv().post(url, data))
-            const routes_observable = this.process_route_options(query, options, response);
-            //var res: any;
-            response.subscribe({
-              next(x) {
-                const doSom = async () => {
-                  console.log('this is x', x);
-                  const u = String(x.url);
-                  console.log(u);
-                  const ind = u.indexOf('C');
-                  const final = u.substring(ind, u.length - 1);
-                  console.log(final);
-                  if (final.length > 24) {
-                    const newData: any = x.data;
-                    console.log(newData[final].value);
-                    const data = {
-                      queries: [
-                        {
-                          //queryText:
-                          //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-                          queryText: String(newData[final].value),
-                          datasourceId: 7,
-                          withStreaming: false,
-                        },
-                      ],
-                    };
-                    const url = 'http://localhost:3030/api/ds/query';
-                    const res = await getBackendSrv().post(url, data);
-                    return res;
-                  }
-                };
-                doSom();
-              },
-            });
-            //console.log('this is the response', res);
-            const ab = routes_observable.pipe(merge(this.process_device_ts(query, options, response)));
-            console.log('This is the javascript response', ab);
-            //return res;
-            return ab;
+              //       }
+              //     };
+              //     doSom();
+              //   },
+              // });
+              //console.log('this is the response', res);
+              const ab = routes_observable.pipe(merge(this.process_device_ts(query, options, response)));
+              console.log('This is the javascript response', ab);
+              //return res;
+              return ab;
+            }
           } else if (query.route?.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
             const response = this.doRequest(query, 'http');
             const routes_observable = this.process_route_options(query, options, response);
@@ -661,6 +688,8 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
       }
     });
     console.log('observables is:');
+    const query = defaults(target, defaultQuery);
+    const urlForData = 'http://localhost:8080/vui' + query.route;
     console.log(observables);
     return observables[0];
   }
@@ -688,16 +717,26 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     //   username: userName,
     //   password: pass,
     // });
-
+    let url = this.url + '/volttron/authenticate';
     const request: any = {
       method: 'POST',
-      url: 'http://localhost:8080/authenticate',
+      url: url,
       data: { username: userName, password: pass },
     };
     const response = await getBackendSrv().fetch(request);
     response.subscribe({
       next(x) {
-        console.log(x);
+        try {
+          return {
+            status: 'Success',
+            message: 'Success',
+          };
+        } catch {
+          return {
+            status: 'Failure',
+            message: 'Authentication Failed',
+          };
+        }
       },
       error(x) {
         console.error(x);
@@ -705,9 +744,5 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
     });
     console.log(response);
     // Implement a health check for your data source.
-    return {
-      status: 'fail',
-      message: 'Fail',
-    };
   }
 }

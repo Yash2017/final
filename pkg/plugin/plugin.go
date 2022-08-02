@@ -9,18 +9,20 @@ import (
 	"net/http"
 
 	//"strconv"
-
+	"io/ioutil"
 	//"math/rand"
 	"time"
 
 	"sort"
 
+	// "github.com/buger/jsonparser"
 	"github.com/buger/jsonparser"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	"github.com/grafana/grafana-plugin-sdk-go/live"
+
+	// "github.com/grafana/grafana-plugin-sdk-go/live"
 	"golang.org/x/net/websocket"
 )
 
@@ -88,6 +90,8 @@ type qModel struct {
 
 var st = ""
 
+var stringQueryRoute = ""
+
 //var stop = make(chan bool)
 
 //var que string = ""
@@ -96,76 +100,115 @@ func (d *SampleDatasource) query(_ context.Context, pCtx backend.PluginContext, 
 	response := backend.DataResponse{}
 	//log.DefaultLogger.Info("query is ", query.JSON)
 	//stop <- false
-	qu, err := jsonparser.GetString(query.JSON, "queryText")
-	//que.fin := string(que.quer)
-	//que := string(quer)
-	st = string(qu)
 
+	queryRoute, err := jsonparser.GetString(query.JSON, "queryRoute")
+
+	stringQueryRoute = string(queryRoute)
+	log.DefaultLogger.Info("This is the string query route", stringQueryRoute)
+
+	resp, err := http.Get(stringQueryRoute)
 	if err != nil {
-		log.DefaultLogger.Info("JsonParser error is", err)
-	}
-	log.DefaultLogger.Info("This is the st string", st)
-	log.DefaultLogger.Info("This is the value")
-
-	//som := jsonMap["data"]
-	//log.DefaultLogger.Info("This is json Map", st)
-	// keys := make([]string, 0, len(jsonMap["data"]))
-	// for k := range jsonMap["data"] {
-	// 	keys = append(keys, k)
-	// }
-	// sort.Strings(keys)
-	// log.DefaultLogger.Info(keys[0])
-
-	// for _, k := range keys {
-	// 	//fmt.Println(k, population[k])
-	// 	log.DefaultLogger.Info("Value in the array is ", k, jsonMap["data"][k])
-
-	// }
-	// dat, err := base64.StdEncoding.DecodeString(string(val))
-	// if err != nil {
-
-	// }
-
-	//log.DefaultLogger.Info("This is the val string after decoding", dat)
-	// Unmarshal the JSON into our queryModel.
-	var qm qModel
-
-	response.Error = json.Unmarshal(query.JSON, &qm)
-	log.DefaultLogger.Info("Error is", response.Error)
-	if response.Error != nil {
-		return response
+		//log.Fatalln(err)
 	}
 
-	log.DefaultLogger.Info("Qm is ", qm)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		//log.Fatalln(err)
+	}
+	sb := string(body)
 
-	// create data frame response.
+	var jsonMap map[string]interface{}
+	json.Unmarshal([]byte(sb), &jsonMap)
+
+	// be aware that inner items are of type interface{}
+	foo := jsonMap["Campus/Building1/Fake2/OutsideAirTemperature1"]
+	// cast foo to map
+	fooMap := foo.(map[string]interface{})
+	log.DefaultLogger.Info("This is the response in string", sb)
+	value := fooMap["value"]
+	log.DefaultLogger.Info("This is the value", value.(float64))
 	frame := data.NewFrame("response")
 
 	frame.Fields = append(frame.Fields,
 		data.NewField("time", nil, make([]time.Time, 1)),
-		data.NewField("values", nil, make([]string, 1)),
+		data.NewField("OutsideAirTemperature1", nil, make([]float64, 1)),
 	)
-	frame.Fields[1].Set(0, st)
-
-	// If query called with streaming on then return a channel
-	// to subscribe on a client-side and consume updates from a plugin.
-	// Feel free to remove this if you don't need streaming for your datasource.
-	if qm.WithStreaming {
-		channel := live.Channel{
-			Scope:     live.ScopeDatasource,
-			Namespace: pCtx.DataSourceInstanceSettings.UID,
-			Path:      query.QueryType,
-		}
-		frame.SetMeta(&data.FrameMeta{Channel: channel.String()})
-	}
-	/*if query.QueryType == "new" {
-		log.DefaultLogger.Info("Inside the if Function")
-		stop <- true
-	}*/
-	// add the frames to the response.
+	frame.Fields[1].Set(0, value.(float64))
 	response.Frames = append(response.Frames, frame)
 
 	return response
+
+	// qu, err := jsonparser.GetString(query.JSON, "queryText")
+
+	// //que.fin := string(que.quer)
+	// //que := string(quer)
+	// st = string(qu)
+
+	// if err != nil {
+	// 	log.DefaultLogger.Info("JsonParser error is", err)
+	// }
+	// log.DefaultLogger.Info("This is the st string", st)
+	// log.DefaultLogger.Info("This is the value")
+
+	// //som := jsonMap["data"]
+	// //log.DefaultLogger.Info("This is json Map", st)
+	// // keys := make([]string, 0, len(jsonMap["data"]))
+	// // for k := range jsonMap["data"] {
+	// // 	keys = append(keys, k)
+	// // }
+	// // sort.Strings(keys)
+	// // log.DefaultLogger.Info(keys[0])
+
+	// // for _, k := range keys {
+	// // 	//fmt.Println(k, population[k])
+	// // 	log.DefaultLogger.Info("Value in the array is ", k, jsonMap["data"][k])
+
+	// // }
+	// // dat, err := base64.StdEncoding.DecodeString(string(val))
+	// // if err != nil {
+
+	// // }
+
+	// //log.DefaultLogger.Info("This is the val string after decoding", dat)
+	// // Unmarshal the JSON into our queryModel.
+	// var qm qModel
+
+	// response.Error = json.Unmarshal(query.JSON, &qm)
+	// log.DefaultLogger.Info("Error is", response.Error)
+	// if response.Error != nil {
+	// 	return response
+	// }
+
+	// log.DefaultLogger.Info("Qm is ", qm)
+
+	// // create data frame response.
+	// //frame := data.NewFrame("response")
+
+	// frame.Fields = append(frame.Fields,
+	// 	data.NewField("time", nil, make([]time.Time, 1)),
+	// 	data.NewField("values", nil, make([]string, 1)),
+	// )
+	// frame.Fields[1].Set(0, st)
+
+	// // If query called with streaming on then return a channel
+	// // to subscribe on a client-side and consume updates from a plugin.
+	// // Feel free to remove this if you don't need streaming for your datasource.
+	// if qm.WithStreaming {
+	// 	channel := live.Channel{
+	// 		Scope:     live.ScopeDatasource,
+	// 		Namespace: pCtx.DataSourceInstanceSettings.UID,
+	// 		Path:      query.QueryType,
+	// 	}
+	// 	frame.SetMeta(&data.FrameMeta{Channel: channel.String()})
+	// }
+	// /*if query.QueryType == "new" {
+	// 	log.DefaultLogger.Info("Inside the if Function")
+	// 	stop <- true
+	// }*/
+	// // add the frames to the response.
+	// response.Frames = append(response.Frames, frame)
+
+	// return response
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.

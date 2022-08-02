@@ -9846,71 +9846,73 @@ function (_super) {
           } else if ((_g = query.route) === null || _g === void 0 ? void 0 : _g.match(/^\/platforms\/.+\/devices\/.+\/?$/)) {
             query.route = query.route + '?' + query.query_params;
 
-            var response = _this.doRequest(query, 'http'); //console.log('Response from backend srv', getBackendSrv().post(url, data))
+            var response = _this.doRequest(query, 'http'); //const routePath = '/vui';
 
 
-            var routes_observable = _this.process_route_options(query, options, response); //var res: any;
+            var urlForData = 'http://localhost:8080/vui' + query.route;
+            console.log('This is full query route', urlForData);
+            var url = 'http://localhost:3030/api/ds/query';
+
+            if (urlForData.length > 97) {
+              var request = {
+                method: 'POST',
+                datasourceId: 7,
+                url: url,
+                data: {
+                  queries: [{
+                    //queryText:
+                    //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
+                    queryRoute: urlForData,
+                    datasourceId: 7 //withStreaming: false,
+                    // queryType: "addressForChannel",
+
+                  }]
+                }
+              }; // const
+              // console.log(addressForChannel);
+              // const url = 'http://localhost:3030/api/ds/query';
+              // console.log('Response from backend srv', getBackendSrv().post(url, data));
+
+              var res = Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().fetch(request);
+              res.subscribe({
+                next: function next(x) {
+                  console.log('This is x', x);
+                }
+              });
+              return res;
+            } else {
+              // const routePath = '/vuiwebsock';
+              // let url = this.url + routePath + '/vui' + query.route;
+              // getBackendSrv()
+              //   .get(url)
+              //   .then((res) => console.log("This is the response from get", res));
+              //console.log('Response from backend srv', getBackendSrv().post(url, data))
+              var routes_observable = _this.process_route_options(query, options, response); // var res: any;
+              // response.subscribe({
+              //   next(x) {
+              //     const doSom = async () => {
+              //       console.log('this is x', x);
+              //       const u = String(x.url);
+              //       console.log(u);
+              //       const ind = u.indexOf('C');
+              //       const final = u.substring(ind, u.length - 1);
+              //       console.log(final);
+              //       if (final.length > 24) {
+              //         const newData: any = x.data;
+              //         console.log(newData[final].value);
+              //       }
+              //     };
+              //     doSom();
+              //   },
+              // });
+              //console.log('this is the response', res);
 
 
-            response.subscribe({
-              next: function next(x) {
-                var _this = this;
+              var ab = routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, response)));
+              console.log('This is the javascript response', ab); //return res;
 
-                var doSom = function doSom() {
-                  return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(_this, void 0, void 0, function () {
-                    var u, ind, _final, newData, data, url, res;
-
-                    return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
-                      switch (_a.label) {
-                        case 0:
-                          console.log('this is x', x);
-                          u = String(x.url);
-                          console.log(u);
-                          ind = u.indexOf('C');
-                          _final = u.substring(ind, u.length - 1);
-                          console.log(_final);
-                          if (!(_final.length > 24)) return [3
-                          /*break*/
-                          , 2];
-                          newData = x.data;
-                          console.log(newData[_final].value);
-                          data = {
-                            queries: [{
-                              //queryText:
-                              //"ws://localhost:8080/vui/platforms/volttron1/pubsub/devices/Campus/Building1/Fake1/all",
-                              queryText: String(newData[_final].value),
-                              datasourceId: 7,
-                              withStreaming: false
-                            }]
-                          };
-                          url = 'http://localhost:3030/api/ds/query';
-                          return [4
-                          /*yield*/
-                          , Object(_grafana_runtime__WEBPACK_IMPORTED_MODULE_2__["getBackendSrv"])().post(url, data)];
-
-                        case 1:
-                          res = _a.sent();
-                          return [2
-                          /*return*/
-                          , res];
-
-                        case 2:
-                          return [2
-                          /*return*/
-                          ];
-                      }
-                    });
-                  });
-                };
-
-                doSom();
-              }
-            }); //console.log('this is the response', res);
-
-            var ab = routes_observable.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["merge"])(_this.process_device_ts(query, options, response)));
-            console.log('This is the javascript response', ab); //return res;
-
-            return ab;
+              return ab;
+            }
           } else if ((_h = query.route) === null || _h === void 0 ? void 0 : _h.match(/^\/platforms\/.+\/agents\/.+\/rpc\/.+\/?$/)) {
             var response = _this.doRequest(query, 'http');
 
@@ -9958,13 +9960,14 @@ function (_super) {
 
   DataSource.prototype.testDatasource = function () {
     return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
-      var request, response;
+      var url, request, response;
       return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
         switch (_a.label) {
           case 0:
+            url = this.url + '/volttron/authenticate';
             request = {
               method: 'POST',
-              url: 'http://localhost:8080/authenticate',
+              url: url,
               data: {
                 username: userName,
                 password: pass
@@ -9978,20 +9981,26 @@ function (_super) {
             response = _a.sent();
             response.subscribe({
               next: function next(x) {
-                console.log(x);
+                try {
+                  return {
+                    status: 'Success',
+                    message: 'Success'
+                  };
+                } catch (_a) {
+                  return {
+                    status: 'Failure',
+                    message: 'Authentication Failed'
+                  };
+                }
               },
               error: function error(x) {
                 console.error(x);
               }
             });
-            console.log(response); // Implement a health check for your data source.
-
+            console.log(response);
             return [2
             /*return*/
-            , {
-              status: 'fail',
-              message: 'Fail'
-            }];
+            ];
         }
       });
     });
